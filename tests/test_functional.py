@@ -15,7 +15,8 @@ from anaspike.analysis import (firing_rates_evolution,
                                spike_gaps_coefficient_of_variation_histogram,
                                firing_rate_temporal_correlation,
                                pairwise_temporal_correlation_matrix,
-                               spike_counts_spatial_autocorrelation
+                               spike_counts_spatial_autocorrelation,
+                               hayleighs_spatial_autocorrelation
                                )
 from anaspike.visualization import (spike_raster_plot,
                                     animate_firing_rate_evolution,
@@ -24,7 +25,8 @@ from anaspike.visualization import (spike_raster_plot,
                                     plot_spike_gaps_coefficient_of_variation_histogram,
                                     plot_firing_rate_temporal_correlation,
                                     plot_pairwise_temporal_correlation_matrix,
-                                    animate_spike_counts_spatial_autocorrelation
+                                    animate_spike_counts_spatial_autocorrelation,
+                                    animate_hayleighs_spatial_autocorrelation
                                     )
 
 import nest
@@ -179,6 +181,19 @@ class TestFunctional(unittest.TestCase):
             spatial_autocorrelation = spike_counts_spatial_autocorrelation(p, self.spike_recorder, x_bins, y_bins, t_bins, max_offset, max_offset)
             ani = animate_spike_counts_spatial_autocorrelation(fig, ax, spatial_autocorrelation, max_offset, max_offset, np.array([t.value for t in t_bins]))
             ani.save(self.plots_path / f'spike_counts_spatial_autocorrelation_{n}.gif', fps=20)
+
+    def test_hayleighs_spatial_autocorrelation(self):
+        n_spatial_bins = 5
+        x_bins = Interval(-self.parameters.spatial['extent']['x'] / 2.,
+                          +self.parameters.spatial['extent']['x'] / 2.).bin(n_spatial_bins)
+        y_bins = Interval(-self.parameters.spatial['extent']['y'] / 2.,
+                          +self.parameters.spatial['extent']['y'] / 2.).bin(n_spatial_bins)
+        t_bins = Interval(0., self.parameters.simulation['duration']).bin(100)
+        fig, ax = plt.subplots()
+        for n, p in self.populations.items():
+            spatial_autocorrelation = hayleighs_spatial_autocorrelation(p, self.spike_recorder, x_bins, y_bins, t_bins)
+            ani = animate_hayleighs_spatial_autocorrelation(fig, ax, spatial_autocorrelation, np.array([t.value for t in t_bins]))
+            ani.save(self.plots_path / f'hayleighs_spatial_autocorrelation_{n}.gif', fps=20)
 
 
 if __name__ == '__main__':

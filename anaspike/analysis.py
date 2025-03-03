@@ -1,5 +1,6 @@
 from typing import Iterable, Sequence, Dict, Tuple
 from itertools import product
+from functools import partial
 
 import numpy as np
 from numpy.typing import NDArray
@@ -10,6 +11,7 @@ from anaspike.dataclasses.interval import Interval, Bin
 from anaspike.functions import (firing_rates,
                                 spike_counts_in_spacetime_region,
                                 pearson_correlation_offset_data)
+from anaspike.hayleigh import get_autocorr
 
 
 
@@ -75,4 +77,15 @@ def spike_counts_spatial_autocorrelation(neurons: PopulationData, spike_recorder
     correlation = np.array([pearson_correlation_offset_data(m, m, offset_vectors) for m in counts_map_for_each_t])
     correlation_formatted = np.transpose([[correlation[:,i * len(y_offsets) + j] for j in range(len(y_offsets))] for i in range(len(x_offsets))])
     return correlation_formatted
+
+
+def hayleighs_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval]) -> NDArray[np.float64]:
+    useless_param1 = None
+    useless_param2 = None
+    hayleighs_autocorr_wrapper = partial(get_autocorr, rough_patch_size=useless_param1, norm=useless_param2)
+    
+    spike_trains = spike_recorder.get_spike_trains(neurons.ids)
+    counts_map_for_each_t = np.array([[[spike_counts_in_spacetime_region(neurons.x_pos, neurons.y_pos, spike_trains, x_bin, y_bin, t_bin)
+                                        for y_bin in ys] for x_bin in xs] for t_bin in ts])
+    return np.array([hayleighs_autocorr_wrapper(m) for m in counts_map_for_each_t])
 
