@@ -122,9 +122,9 @@ class TestFunctional(unittest.TestCase):
     def test_firing_rates_evolution(self):
         t_bins = Interval(0., self.parameters.simulation['duration']).bin(100)
         times = np.array([t.value for t in t_bins])
-        fig, ax = plt.subplots()
         for n, p in self.populations.items():
             firing_rates_at_times = firing_rates_evolution(p, self.spike_recorder, t_bins)
+            fig, ax = plt.subplots()
             ani = animate_firing_rate_evolution(fig, ax, p.x_pos, p.y_pos, times, firing_rates_at_times)
             ani.save(self.plots_path / f'firing_rates_evolution_{n}.gif', fps=20)
 
@@ -176,9 +176,10 @@ class TestFunctional(unittest.TestCase):
                           +self.parameters.spatial['extent']['y'] / 2.).bin(n_spatial_bins)
         t_bins = Interval(0., self.parameters.simulation['duration']).bin(100)
         max_offset = n_spatial_bins - 2
-        fig, ax = plt.subplots()
+
         for n, p in self.populations.items():
             spatial_autocorrelation = spike_counts_spatial_autocorrelation(p, self.spike_recorder, x_bins, y_bins, t_bins, max_offset, max_offset)
+            fig, ax = plt.subplots()
             ani = animate_spike_counts_spatial_autocorrelation(fig, ax, spatial_autocorrelation, max_offset, max_offset, np.array([t.value for t in t_bins]))
             ani.save(self.plots_path / f'spike_counts_spatial_autocorrelation_{n}.gif', fps=20)
 
@@ -189,9 +190,10 @@ class TestFunctional(unittest.TestCase):
         y_bins = Interval(-self.parameters.spatial['extent']['y'] / 2.,
                           +self.parameters.spatial['extent']['y'] / 2.).bin(n_spatial_bins)
         t_bins = Interval(0., self.parameters.simulation['duration']).bin(100)
-        fig, ax = plt.subplots()
+
         for n, p in self.populations.items():
             spatial_autocorrelation = hayleighs_spatial_autocorrelation(p, self.spike_recorder, x_bins, y_bins, t_bins)
+            fig, ax = plt.subplots()
             ani = animate_hayleighs_spatial_autocorrelation(fig, ax, spatial_autocorrelation, np.array([t.value for t in t_bins]))
             ani.save(self.plots_path / f'hayleighs_spatial_autocorrelation_{n}.gif', fps=20)
 
