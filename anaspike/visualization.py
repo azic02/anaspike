@@ -81,7 +81,22 @@ def animate_spike_counts_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_
 
     return ani
 
+
 def animate_hayleighs_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_autocorrelation: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
+    def update_plot(i, data, img, time):
+        img.set_array(data[i])
+        plt.title(f'elapsed time: {int(time[i])} ms')
+        return img,
+
+    img = ax.imshow(spatial_autocorrelation[0], vmin=-1, vmax=1, **kwargs)
+    ani = animation.FuncAnimation(fig, update_plot, frames=len(times), fargs=(spatial_autocorrelation, img, times))
+
+    fig.colorbar(img, ax=ax, label='correlation coefficient')
+
+    return ani
+
+
+def animate_sigrids_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_autocorrelation: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
     def update_plot(i, data, img, time):
         img.set_array(data[i])
         plt.title(f'elapsed time: {int(time[i])} ms')

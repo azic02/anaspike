@@ -273,6 +273,16 @@ ani = animate_hayleighs_spatial_autocorrelation(fig, ax, autocorr_for_each_t, ti
 HTML(ani.to_jshtml())
 
 # +
+from anaspike.analysis import sigrids_spatial_autocorrelation
+from anaspike.visualization import animate_sigrids_spatial_autocorrelation
+
+autocorr_for_each_t = sigrids_spatial_autocorrelation(pop, spike_recorder, x_bins, y_bins, t_bins)
+
+fig, ax = plt.subplots()
+ani = animate_sigrids_spatial_autocorrelation(fig, ax, autocorr_for_each_t, time_vals, cmap='bwr')
+HTML(ani.to_jshtml())
+
+# +
 from anaspike.analysis import spike_counts_spatial_autocorrelation
 from anaspike.visualization import animate_spike_counts_spatial_autocorrelation
 

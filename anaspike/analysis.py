@@ -1,4 +1,4 @@
-from typing import Iterable, Sequence, Dict, Tuple
+from typing import Iterable, Sequence, Dict, Tuple, Literal
 from itertools import product
 from functools import partial
 
@@ -12,6 +12,7 @@ from anaspike.functions import (firing_rates,
                                 spike_counts_in_spacetime_region,
                                 pearson_correlation_offset_data)
 from anaspike.hayleigh import get_autocorr
+from anaspike.sigrid import cross_correlate_masked
 
 
 
@@ -88,4 +89,12 @@ def hayleighs_spatial_autocorrelation(neurons: PopulationData, spike_recorder: S
     counts_map_for_each_t = np.array([[[spike_counts_in_spacetime_region(neurons.x_pos, neurons.y_pos, spike_trains, x_bin, y_bin, t_bin)
                                         for y_bin in ys] for x_bin in xs] for t_bin in ts])
     return np.array([hayleighs_autocorr_wrapper(m) for m in counts_map_for_each_t])
+
+
+def sigrids_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval], overlap_ratio: float = 0.2, mode: Literal['same','full'] = 'same') -> NDArray[np.float64]:
+    spike_trains = spike_recorder.get_spike_trains(neurons.ids)
+    counts_map_for_each_t = np.array([[[spike_counts_in_spacetime_region(neurons.x_pos, neurons.y_pos, spike_trains, x_bin, y_bin, t_bin)
+                                        for y_bin in ys] for x_bin in xs] for t_bin in ts])
+    mask = np.ones_like(counts_map_for_each_t[0])
+    return np.array([cross_correlate_masked(m, m, mask, mask, mode, axes=(-2,-1), overlap_ratio=overlap_ratio) for m in counts_map_for_each_t])
 
