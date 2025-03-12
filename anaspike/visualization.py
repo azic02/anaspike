@@ -96,6 +96,23 @@ def animate_hayleighs_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_aut
     return ani
 
 
+def animate_hayleighs_spatial_autocorrelation_radial_avg(fig: Figure, ax: Axes, spatial_autocorr_radial_avg: NDArray[np.float64], distances: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
+    def update_plot(i, data, line, time):
+        line.set_ydata(data[i])
+        plt.title(f'elapsed time: {int(time[i])} ms')
+        return line,
+
+    line, = ax.plot(distances, spatial_autocorr_radial_avg[0], **kwargs)
+    ani = animation.FuncAnimation(fig, update_plot, frames=len(times), fargs=(spatial_autocorr_radial_avg, line, times))
+
+    ax.set_xlabel('distance (mm)')
+    ax.set_ylabel('correlation coefficient')
+    ax.set_xlim(0, max(distances))
+    ax.set_ylim(-1, 1)
+
+    return ani
+
+
 def animate_sigrids_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_autocorrelation: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
     def update_plot(i, data, img, time):
         img.set_array(data[i])
@@ -106,6 +123,22 @@ def animate_sigrids_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_autoc
     ani = animation.FuncAnimation(fig, update_plot, frames=len(times), fargs=(spatial_autocorrelation, img, times))
 
     fig.colorbar(img, ax=ax, label='correlation coefficient')
+
+    return ani
+
+
+def animate_sigrids_spatial_autocorrelation_radial_avg(fig: Figure, ax: Axes, spatial_autocorr_radial_avg: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
+    def update_plot(i, data, line, time):
+        line.set_ydata(data[i])
+        plt.title(f'elapsed time: {int(time[i])} ms')
+        return line,
+
+    line, = ax.plot(spatial_autocorr_radial_avg[0], **kwargs)
+    ani = animation.FuncAnimation(fig, update_plot, frames=len(times), fargs=(spatial_autocorr_radial_avg, line, times))
+
+    ax.set_ylabel('correlation coefficient')
+    ax.set_xlim(0, len(spatial_autocorr_radial_avg[0]))
+    ax.set_ylim(-1, 1)
 
     return ani
 

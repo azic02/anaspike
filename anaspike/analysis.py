@@ -11,8 +11,8 @@ from anaspike.dataclasses.interval import Interval, Bin
 from anaspike.functions import (firing_rates,
                                 spike_counts_in_spacetime_region,
                                 pearson_correlation_offset_data)
-from anaspike.hayleigh import get_autocorr
-from anaspike.sigrid import cross_correlate_masked
+from anaspike.hayleigh import get_autocorr, average_over_interp2d
+from anaspike.sigrid import cross_correlate_masked, get_radial_acorr
 
 
 
@@ -91,10 +91,25 @@ def hayleighs_spatial_autocorrelation(neurons: PopulationData, spike_recorder: S
     return np.array([hayleighs_autocorr_wrapper(m) for m in counts_map_for_each_t])
 
 
+def hayleighs_spatial_autocorrelation_radial_avg(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval], spatial_bin_size: float) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
+    microns_per_pixel = spatial_bin_size * 1000
+    spatial_autocorr = hayleighs_spatial_autocorrelation(neurons, spike_recorder, xs, ys, ts)
+    spectrum, distance = average_over_interp2d(spatial_autocorr, microns_per_pixel/1000, 360)
+    return np.array(spectrum, dtype=np.float64), np.array(distance[0,:], dtype=np.float64)
+
+
 def sigrids_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval], overlap_ratio: float = 0.2, mode: Literal['same','full'] = 'same') -> NDArray[np.float64]:
     spike_trains = spike_recorder.get_spike_trains(neurons.ids)
     counts_map_for_each_t = np.array([[[spike_counts_in_spacetime_region(neurons.x_pos, neurons.y_pos, spike_trains, x_bin, y_bin, t_bin)
                                         for y_bin in ys] for x_bin in xs] for t_bin in ts])
     mask = np.ones_like(counts_map_for_each_t[0])
     return np.array([cross_correlate_masked(m, m, mask, mask, mode, axes=(-2,-1), overlap_ratio=overlap_ratio) for m in counts_map_for_each_t])
+
+
+def sigrids_spatial_autocorrelation_radial_avg(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval]) -> NDArray[np.float64]:
+    spike_trains = spike_recorder.get_spike_trains(neurons.ids)
+    counts_map_for_each_t = np.array([[[spike_counts_in_spacetime_region(neurons.x_pos, neurons.y_pos, spike_trains, x_bin, y_bin, t_bin)
+                                        for y_bin in ys] for x_bin in xs] for t_bin in ts])
+    mask = np.ones_like(counts_map_for_each_t[0])
+    return get_radial_acorr(counts_map_for_each_t, mask)
 

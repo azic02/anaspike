@@ -180,10 +180,13 @@ pop = populations['inh']
 extent = 2.
 t_sim = 10000.
 
-t_bins = Interval(100., t_sim).bin(size=500.)
-x_bins = Interval(-extent / 2., extent / 2.).bin(50)
-y_bins = Interval(-extent / 2., extent / 2.).bin(50)
+n_spatial_bins = 50
 
+t_bins = Interval(100., t_sim).bin(size=500.)
+x_bins = Interval(-extent / 2., extent / 2.).bin(n_spatial_bins)
+y_bins = Interval(-extent / 2., extent / 2.).bin(n_spatial_bins)
+
+spatial_bin_size = extent / n_spatial_bins
 time_vals = [t_bin.value for t_bin in t_bins]
 # -
 
@@ -273,6 +276,16 @@ ani = animate_hayleighs_spatial_autocorrelation(fig, ax, autocorr_for_each_t, ti
 HTML(ani.to_jshtml())
 
 # +
+from anaspike.analysis import hayleighs_spatial_autocorrelation_radial_avg
+from anaspike.visualization import animate_hayleighs_spatial_autocorrelation_radial_avg
+
+radial_autocorr_for_each_t, distances = hayleighs_spatial_autocorrelation_radial_avg(pop, spike_recorder, x_bins, y_bins, t_bins, spatial_bin_size)
+
+fig, ax = plt.subplots()
+ani = animate_hayleighs_spatial_autocorrelation_radial_avg(fig, ax, radial_autocorr_for_each_t, distances, time_vals)
+HTML(ani.to_jshtml())
+
+# +
 from anaspike.analysis import sigrids_spatial_autocorrelation
 from anaspike.visualization import animate_sigrids_spatial_autocorrelation
 
@@ -280,6 +293,16 @@ autocorr_for_each_t = sigrids_spatial_autocorrelation(pop, spike_recorder, x_bin
 
 fig, ax = plt.subplots()
 ani = animate_sigrids_spatial_autocorrelation(fig, ax, autocorr_for_each_t, time_vals, cmap='bwr')
+HTML(ani.to_jshtml())
+
+# +
+from anaspike.analysis import sigrids_spatial_autocorrelation_radial_avg
+from anaspike.visualization import animate_sigrids_spatial_autocorrelation_radial_avg
+
+radial_autocorr_for_each_t = sigrids_spatial_autocorrelation_radial_avg(pop, spike_recorder, x_bins, y_bins, t_bins)
+
+fig, ax = plt.subplots()
+ani = animate_sigrids_spatial_autocorrelation_radial_avg(fig, ax, radial_autocorr_for_each_t, time_vals)
 HTML(ani.to_jshtml())
 
 # +
