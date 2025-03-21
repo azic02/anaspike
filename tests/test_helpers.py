@@ -2,11 +2,54 @@ import unittest
 
 import numpy as np
 
-from anaspike.functions._helpers import (slice_from_vec,
+from anaspike.functions._helpers import (construct_offsets,
+                                         construct_offset_vectors,
+                                         slice_from_vec,
                                          offset_via_slicing,
                                          validate_same_length,
                                          )
 
+
+
+class TestConstructOffsets(unittest.TestCase):
+    def test_n_less_than_margin(self):
+        n = 10
+        margin = 20
+        with self.assertRaises(ValueError):
+            construct_offsets(n, margin)
+
+    def test_n_greater_than_margin(self):
+        n = 21
+        margin = 20
+        result = construct_offsets(n, margin)
+        expected = np.array([-1, 0, 1])
+        np.testing.assert_array_equal(result, expected)
+
+
+class TestConstructOffsetVectors(unittest.TestCase):
+    def test_n_x_less_than_margin(self):
+        n_x = 10
+        n_y = 21
+        margin = 20
+        with self.assertRaises(ValueError):
+            construct_offset_vectors(n_x, n_y, margin)
+
+    def test_n_y_less_than_margin(self):
+        n_x = 21
+        n_y = 10
+        margin = 20
+        with self.assertRaises(ValueError):
+            construct_offset_vectors(n_x, n_y, margin)
+
+    def test_n_x_and_n_y_greater_than_margin(self):
+        n_x = 21
+        n_y = 21
+        margin = 20
+        result = construct_offset_vectors(n_x, n_y, margin)
+        expected = np.array([(-1, -1), (-1, 0), (-1, 1),
+                             (0 , -1), (0 , 0), (0 , 1),
+                             (+1, -1), (+1, 0), (+1, 1)])
+        np.testing.assert_array_equal(result, expected)
 
 
 class TestSliceFromVec(unittest.TestCase):

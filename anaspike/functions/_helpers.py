@@ -1,8 +1,21 @@
 from typing import Any, Sized, Iterable, Tuple
+from itertools import product
 
 import numpy as np
 from numpy.typing import NDArray
 
+
+
+def construct_offsets(n: int, margin: int) -> NDArray[np.int64]:
+    if n < margin:
+        raise ValueError(f"n must be at least {margin}.")
+    max_offset = n - margin
+    return np.arange(-max_offset, max_offset + 1)
+
+
+def construct_offset_vectors(n_x: int, n_y: int, margin: int) -> NDArray[np.int64]:
+    x_offsets, y_offsets = construct_offsets(n_x, margin), construct_offsets(n_y, margin)
+    return np.array(tuple(product(x_offsets, y_offsets)), dtype=np.int64)
 
 
 def slice_from_vec(v: Iterable[int]) -> Tuple[slice, ...]:

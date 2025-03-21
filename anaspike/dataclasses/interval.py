@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Iterator, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -26,17 +26,8 @@ class Interval:
     def contains(self, x) -> bool:
         return (self.start <= x) & (x < self.end)
 
-    def bin(self, n: Optional[int] = None, size: Optional[float] = None) -> Tuple['Bin', ...]:
-        if n is None and size is None:
-            raise ValueError("Either n or size must be specified")
-        elif n is not None and size is not None:
-            raise ValueError("Only one of n or size can be specified")
-        elif n is not None:
-            edges = np.linspace(self.start, self.end, n + 1)
-        else:
-            edges = np.arange(self.start, self.end, size)
-        values = edges[:-1] + np.diff(edges) / 2
-        return tuple(Bin(s, e, v) for s, e, v in zip(edges[:-1], edges[1:], values))
+    def bin(self, n: Optional[int] = None, size: Optional[float] = None) -> 'EquidistantBins':
+        return EquidistantBins(self, n, size)
 
 
 class Bin(Interval):
@@ -47,4 +38,36 @@ class Bin(Interval):
     @property
     def value(self) -> float:
         return self.__value
+
+
+class Bins:
+    def __init__(self, bins: Sequence[Bin]):
+        self.__bins = bins
+
+    def __getitem__(self, key: int) -> Bin:
+        return self.__bins[key]
+
+    def __len__(self) -> int:
+        return len(self.__bins)
+
+    def __iter__(self) -> Iterator[Bin]:
+        return iter(self.__bins)
+
+
+class EquidistantBins(Bins):
+    def __init__(self, interval: Interval, n: Optional[int] = None, size: Optional[float] = None):
+        if n is None and size is None:
+            raise ValueError("Either n or size must be specified")
+        elif n is not None and size is not None:
+            raise ValueError("Only one of n or size can be specified")
+        elif n is not None:
+            edges = np.linspace(interval.start, interval.end, n + 1)
+        else:
+            edges = np.arange(interval.start, interval.end, size)
+        values = edges[:-1] + np.diff(edges) / 2
+        super().__init__(tuple(Bin(s, e, v) for s, e, v in zip(edges[:-1], edges[1:], values)))
+
+    @property
+    def bin_width(self) -> float:
+        return self[0].width
 

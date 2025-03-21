@@ -1,8 +1,9 @@
 import unittest
+from unittest.mock import patch, MagicMock
 
 import numpy as np
 
-from anaspike.functions import pearson_correlation_offset_data
+from anaspike.functions import pearson_correlation_offset_data, radial_average
 
 
 
@@ -65,6 +66,128 @@ class TestPearsonCorrelationOffsetData(unittest.TestCase):
         expected_corr = [1.]
         np.testing.assert_array_almost_equal(corr, expected_corr)
 
+
+class TestRadialAverage(unittest.TestCase):
+    def setUp(self):
+        """Common mock configuration for Bin class"""
+        self.mock_bin_patcher = patch('anaspike.dataclasses.interval.Bin')
+        self.mock_bin = self.mock_bin_patcher.start()
+        
+        self.mock_bin.side_effect = lambda start, end: MagicMock(
+            start=start, 
+            end=end
+        )
+
+    def tearDown(self):
+        self.mock_bin_patcher.stop()
+
+    def test_single_point_one_bin(self):
+        origin = (0.0, 0.0)
+        x = np.array([1.0])
+        y = np.array([0.0])
+        data = np.array([5.0])
+        bins = [self.mock_bin(0.0, 2.0)]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([5.0]))
+
+    def test_multiple_points_one_bin(self):
+        origin = (0.0, 0.0)
+        x = np.array([1.0, 0.0])
+        y = np.array([0.0, 1.0])
+        data = np.array([3.0, 7.0])
+        bins = [self.mock_bin(0.0, 2.0)]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([5.0]))
+
+    def test_multiple_points_multiple_bins(self):
+        origin = (0.0, 0.0)
+        x = np.array([1.0, 2.0, 3.0])
+        y = np.array([0.0, 0.0, 0.0])
+        data = np.array([2.0, 4.0, 6.0])
+        bins = [
+            self.mock_bin(0.5, 1.5),
+            self.mock_bin(1.5, 2.5),
+            self.mock_bin(2.5, 3.5)
+        ]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([2.0, 4.0, 6.0]))
+
+    def test_empty_bin(self):
+        origin = (0.0, 0.0)
+        x = np.array([0.5, 2.5])
+        y = np.array([0.0, 0.0])
+        data = np.array([10.0, 20.0])
+        bins = [
+            self.mock_bin(0.0, 1.0),
+            self.mock_bin(1.0, 2.0),
+            self.mock_bin(2.0, 3.0)
+        ]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([10.0, 0.0, 20.0]))
+
+    def test_empty_bins(self):
+        origin = (0.0, 0.0)
+        x = np.array([])
+        y = np.array([])
+        data = np.array([])
+        bins = [
+            self.mock_bin(0.0, 1.0),
+            self.mock_bin(1.0, 2.0)
+        ]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([0.0, 0.0]))
+
+    def test_origin_shift(self):
+        origin = (2.0, 3.0)
+        x = np.array([2.0])
+        y = np.array([4.0])
+        data = np.array([10.0])
+        bins = [self.mock_bin(0.5, 1.5)]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([10.0]))
+
+    def test_bin_edge_points(self):
+        origin = (0.0, 0.0)
+        x = np.array([1.0, 2.0, 3.0])
+        y = np.array([0.0, 0.0, 0.0])
+        data = np.array([10.0, 20.0, 30.0])
+        bins = [
+            self.mock_bin(1.0, 2.0),
+            self.mock_bin(2.0, 3.0)
+        ]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([10.0, 25.0]))
+
+    def test_point_at_origin(self):
+        origin = (0.0, 0.0)
+        x = np.array([0.0])
+        y = np.array([0.0])
+        data = np.array([5.0])
+        bins = [self.mock_bin(0.0, 1.0)]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([5.0]))
+
+    def test_non_uniform_bins(self):
+        origin = (0.0, 0.0)
+        x = np.array([0.5, 1.5, 2.5, 3.5])
+        y = np.array([0.0, 0.0, 0.0, 0.0])
+        data = np.array([1.0, 2.0, 3.0, 4.0])
+        bins = [
+            self.mock_bin(0.0, 1.0),
+            self.mock_bin(1.0, 3.0),
+            self.mock_bin(3.0, 4.0)
+        ]
+        
+        result = radial_average(origin, x, y, data, bins)
+        np.testing.assert_array_almost_equal(result, np.array([1.0, 2.5, 4.0]))
 
 
 if __name__ == '__main__':

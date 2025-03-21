@@ -1,5 +1,4 @@
 from typing import Iterable, Sequence, Dict, Tuple, Literal
-from itertools import product
 from functools import partial
 
 import numpy as np
@@ -7,12 +6,14 @@ from numpy.typing import NDArray
 from scipy.stats import pearsonr, variation
 
 from anaspike.dataclasses.nest_devices import PopulationData, NeuronData, SpikeRecorderData
-from anaspike.dataclasses.interval import Interval, Bin
-from anaspike.functions import (firing_rates,
-                                spike_counts_in_spacetime_region,
-                                pearson_correlation_offset_data)
+from anaspike.dataclasses.interval import Interval, Bin, EquidistantBins
+from anaspike.functions.spike_derived_quantities import (firing_rates,
+                                                         spike_counts_in_spacetime_region)
+from anaspike.functions.statistical_quantities import (pearson_correlation_offset_data,
+                                                       radial_average)
 from anaspike.hayleigh import get_autocorr, average_over_interp2d
 from anaspike.sigrid import cross_correlate_masked, get_radial_acorr
+from anaspike.functions._helpers import construct_offset_vectors
 
 
 
@@ -68,16 +69,19 @@ def pairwise_temporal_correlation_matrix(population: PopulationData, spike_recor
     return np.corrcoef(firing_rate_matrix, rowvar=False)
 
 
-def spike_counts_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Bin], max_x_offset: int, max_y_offset: int) -> NDArray[np.float64]:
+def spike_counts_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Sequence[Interval], ys: Sequence[Interval], ts: Iterable[Interval]) -> NDArray[np.float64]:
     spike_trains = spike_recorder.get_spike_trains(neurons.ids)
     counts_map_for_each_t = np.array([[[spike_counts_in_spacetime_region(neurons.x_pos, neurons.y_pos, spike_trains, x_bin, y_bin, t_bin)
                                         for y_bin in ys] for x_bin in xs] for t_bin in ts])
-    x_offsets = np.arange(-max_x_offset, max_x_offset + 1)
-    y_offsets = np.arange(-max_y_offset, max_y_offset + 1)
-    offset_vectors = np.array(tuple(product(x_offsets, y_offsets)), dtype=np.int64)
-    correlation = np.array([pearson_correlation_offset_data(m, m, offset_vectors) for m in counts_map_for_each_t])
-    correlation_formatted = np.transpose([[correlation[:,i * len(y_offsets) + j] for j in range(len(y_offsets))] for i in range(len(x_offsets))])
-    return correlation_formatted
+    offset_vectors = construct_offset_vectors(len(xs), len(ys), margin=20)
+    return np.array([pearson_correlation_offset_data(m, m, offset_vectors) for m in counts_map_for_each_t])
+
+
+def spike_counts_spatial_autocorrelation_radial_avg(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: EquidistantBins, ys: EquidistantBins, ts: Iterable[Interval], origin: Tuple[float,float], radial_bins: Sequence[Bin]) -> NDArray[np.float64]:
+    spatial_autocorr = spike_counts_spatial_autocorrelation(neurons, spike_recorder, xs, ys, ts)
+    offset_vectors = construct_offset_vectors(len(xs), len(ys), margin=20)
+    offset_vectors_in_spatial_units = np.array([(origin[0] + xs.bin_width * ov[0], origin[1] + ys.bin_width * ov[1]) for ov in offset_vectors])
+    return np.array([radial_average(origin, offset_vectors_in_spatial_units[:,0], offset_vectors_in_spatial_units[:,1], a, radial_bins) for a in spatial_autocorr])
 
 
 def hayleighs_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval]) -> NDArray[np.float64]:

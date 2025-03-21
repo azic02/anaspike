@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple
+from typing import Iterable, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -6,6 +6,9 @@ from matplotlib.figure import Figure
 from matplotlib.axes import Axes
 import numpy as np
 from numpy.typing import NDArray
+
+from anaspike.dataclasses.interval import Interval, Bin
+from anaspike.functions._helpers import construct_offsets
 
 
 
@@ -66,18 +69,40 @@ def plot_pairwise_temporal_correlation_matrix(fig: Figure, ax: Axes, correlation
     fig.colorbar(img, ax=ax, label="pearson's correlation coefficient")
 
 
-def animate_spike_counts_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_autocorrelation, max_x_offset: int, max_y_offset, times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
+def animate_spike_counts_spatial_autocorrelation(fig: Figure, ax: Axes, xs: Sequence[Interval], ys: Sequence[Interval], spatial_autocorrelation: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
     def update_plot(i, data, scat, time):
         mesh.set_array(data[i])
         plt.title(f'elapsed time: {int(time[i])} ms')
         return scat,
 
-    x_offsets = np.arange(-max_x_offset, max_x_offset + 1)
-    y_offsets = np.arange(-max_y_offset, max_y_offset + 1)
-    mesh = ax.pcolormesh(x_offsets, y_offsets, spatial_autocorrelation[0], vmin=-1, vmax=1, **kwargs)
-    ani = animation.FuncAnimation(fig, update_plot, frames=len(times), fargs=(spatial_autocorrelation, mesh, times))
+    margin = 20
+    x_offsets, y_offsets = construct_offsets(len(xs), margin), construct_offsets(len(ys), margin)
+    correlation_formatted = np.transpose([[spatial_autocorrelation[:,i * len(y_offsets) + j] for j in range(len(y_offsets))] for i in range(len(x_offsets))])
+
+    mesh = ax.pcolormesh(x_offsets, y_offsets, correlation_formatted[0], vmin=-1, vmax=1, **kwargs)
+    ani = animation.FuncAnimation(fig, update_plot, frames=len(times), fargs=(correlation_formatted, mesh, times))
 
     fig.colorbar(mesh, ax=ax, label="Pearson's correlation coefficient")
+
+    return ani
+
+
+def animate_spike_counts_spatial_autocorrelation_radial_avg(fig: Figure, ax: Axes, radial_bins: Sequence[Bin], spatial_autocorr_radial_avg: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
+    def update_plot(i, data, bars, time):
+        for bar, h in zip(bars, data[i]):
+            bar.set_height(h)
+        plt.title(f'elapsed time: {int(time[i])} ms')
+        return bars,
+
+    bin_vals = [bin_.value for bin_ in radial_bins]
+    bin_widths = [bin_.width for bin_ in radial_bins]
+    bars = ax.bar(bin_vals, spatial_autocorr_radial_avg[0], width=bin_widths, align='center', **kwargs)
+    ani = animation.FuncAnimation(fig, update_plot, frames=len(times), fargs=(spatial_autocorr_radial_avg, bars, times))
+
+    ax.set_xlabel('distance (mm)')
+    ax.set_ylabel('correlation coefficient')
+    ax.set_ylim(-1, 1)
+
 
     return ani
 

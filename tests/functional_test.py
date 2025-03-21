@@ -178,6 +178,7 @@ plot_intra_population_average_firing_rate_evolution(ax, [t_bin.value for t_bin i
 pop = populations['inh']
 
 extent = 2.
+origin = (0., 0.)
 t_sim = 10000.
 
 n_spatial_bins = 50
@@ -309,22 +310,19 @@ HTML(ani.to_jshtml())
 from anaspike.analysis import spike_counts_spatial_autocorrelation
 from anaspike.visualization import animate_spike_counts_spatial_autocorrelation
 
-max_offset_x = len(x_bins) - 20
-max_offset_y = len(y_bins) - 20
-spatial_corr = spike_counts_spatial_autocorrelation(pop,
-                                                    spike_recorder,
-                                                    x_bins,
-                                                    y_bins,
-                                                    t_bins,
-                                                    max_offset_x,
-                                                    max_offset_y)
+spatial_corr = spike_counts_spatial_autocorrelation(pop, spike_recorder, x_bins, y_bins, t_bins)
 
 fig, ax = plt.subplots(figsize=(12,10))
-ani = animate_spike_counts_spatial_autocorrelation(fig,
-                                                   ax,
-                                                   spatial_corr,
-                                                   max_offset_x,
-                                                   max_offset_y,
-                                                   time_vals,
-                                                   cmap='bwr')
+ani = animate_spike_counts_spatial_autocorrelation(fig, ax, x_bins, y_bins, spatial_corr, time_vals, cmap='bwr')
+HTML(ani.to_jshtml())
+
+# +
+from anaspike.analysis import spike_counts_spatial_autocorrelation_radial_avg
+from anaspike.visualization import animate_spike_counts_spatial_autocorrelation_radial_avg
+
+radial_bins = Interval(0., extent / 2).bin(size=x_bins[0].width)
+spatial_corr_radial_avg = spike_counts_spatial_autocorrelation_radial_avg(pop, spike_recorder, x_bins, y_bins, t_bins, origin, radial_bins)
+
+fig, ax = plt.subplots()
+ani = animate_spike_counts_spatial_autocorrelation_radial_avg(fig, ax, radial_bins, spatial_corr_radial_avg, time_vals)
 HTML(ani.to_jshtml())
