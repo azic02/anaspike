@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 
 import numpy as np
 
-from anaspike.functions import pearson_correlation_offset_data, radial_average
+from anaspike.functions.statistical_quantities import pearson_correlation_offset_data, radial_average
 
 
 

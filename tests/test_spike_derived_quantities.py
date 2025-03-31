@@ -3,9 +3,9 @@ from unittest.mock import MagicMock
 
 import numpy as np
 
-from anaspike.functions import (spike_counts,
-                                firing_rates,
-                                spike_counts_in_spacetime_region)
+from anaspike.functions.spike_derived_quantities import (spike_counts,
+                                                         firing_rates,
+                                                         spike_counts_in_spacetime_region)
 from anaspike.dataclasses import SpikeTrainArray
 from anaspike.dataclasses.interval import Interval
 
