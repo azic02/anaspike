@@ -24,6 +24,22 @@ class TestInterval(unittest.TestCase):
         self.assertFalse(self.interval.contains(-1))
         self.assertFalse(self.interval.contains(10))
 
+    def test_discretize_given_n(self):
+        result = self.interval.discretize(6)
+        expected = [0, 2, 4, 6, 8, 10]
+
+        self.assertEqual(len(result), len(expected))
+        for r, e in zip(result, expected):
+            self.assertEqual(r, e)
+
+    def test_discretize_given_size(self):
+        result = self.interval.discretize(size=2)
+        expected = [0, 2, 4, 6, 8]
+
+        self.assertEqual(len(result), len(expected))
+        for r, e in zip(result, expected):
+            self.assertEqual(r, e)
+
     def test_bin_given_num(self):
         result = self.interval.bin(5)
         expected = [Interval(0, 2), Interval(2, 4), Interval(4, 6), Interval(6, 8), Interval(8, 10)]

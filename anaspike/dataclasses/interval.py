@@ -26,6 +26,17 @@ class Interval:
     def contains(self, x) -> bool:
         return (self.start <= x) & (x < self.end)
 
+    def discretize(self, n: Optional[int] = None, size: Optional[float] = None) -> np.ndarray:
+        if n is None and size is None:
+            raise ValueError("Either n or size must be specified")
+        elif n is not None and size is not None:
+            raise ValueError("Only one of n or size can be specified")
+        elif n is not None:
+            points = np.linspace(self.start, self.end, n)
+        else:
+            points = np.arange(self.start, self.end, size)
+        return points
+
     def bin(self, n: Optional[int] = None, size: Optional[float] = None) -> 'EquidistantBins':
         return EquidistantBins(self, n, size)
 
@@ -56,14 +67,9 @@ class Bins:
 
 class EquidistantBins(Bins):
     def __init__(self, interval: Interval, n: Optional[int] = None, size: Optional[float] = None):
-        if n is None and size is None:
-            raise ValueError("Either n or size must be specified")
-        elif n is not None and size is not None:
-            raise ValueError("Only one of n or size can be specified")
-        elif n is not None:
-            edges = np.linspace(interval.start, interval.end, n + 1)
-        else:
-            edges = np.arange(interval.start, interval.end, size)
+        if n is not None:
+            n += 1
+        edges = interval.discretize(n, size)
         values = edges[:-1] + np.diff(edges) / 2
         super().__init__(tuple(Bin(s, e, v) for s, e, v in zip(edges[:-1], edges[1:], values)))
 
