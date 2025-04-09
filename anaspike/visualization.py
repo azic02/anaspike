@@ -107,6 +107,15 @@ def animate_spike_counts_spatial_autocorrelation_radial_avg(fig: Figure, ax: Axe
     return ani
 
 
+def plot_morans_i_evolution(ax: Axes, times: NDArray[np.float64], morans_i: NDArray[np.float64], **kwargs) -> None:
+    ax.plot(times, morans_i, **kwargs)
+    ax.set_xlabel('time (ms)')
+    ax.set_ylabel("Moran's I")
+    ax.set_ylim(-1, 1)
+    ax.set_title("Moran's I Evolution")
+    ax.scatter(times, morans_i, **kwargs)
+
+
 def animate_hayleighs_spatial_autocorrelation(fig: Figure, ax: Axes, spatial_autocorrelation: NDArray[np.float64], times: NDArray[np.float64], **kwargs) -> animation.FuncAnimation:
     def update_plot(i, data, img, time):
         img.set_array(data[i])

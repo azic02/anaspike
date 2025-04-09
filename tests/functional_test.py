@@ -326,3 +326,12 @@ spatial_corr_radial_avg = spike_counts_spatial_autocorrelation_radial_avg(pop, s
 fig, ax = plt.subplots()
 ani = animate_spike_counts_spatial_autocorrelation_radial_avg(fig, ax, radial_bins, spatial_corr_radial_avg, time_vals)
 HTML(ani.to_jshtml())
+
+# +
+from anaspike.analysis import morans_i_evolution
+from anaspike.visualization import plot_morans_i_evolution
+
+morans_i = morans_i_evolution(pop, spike_recorder, t_bins, decay_power=4)
+
+fig, ax = plt.subplots()
+plot_morans_i_evolution(ax, time_vals, morans_i)

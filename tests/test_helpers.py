@@ -7,6 +7,7 @@ from anaspike.functions._helpers import (construct_offsets,
                                          slice_from_vec,
                                          offset_via_slicing,
                                          validate_same_length,
+                                         calculate_pairwise_2d_euclidean_distances
                                          )
 
 
@@ -166,6 +167,40 @@ class TestValidateSameLength(unittest.TestCase):
     def test_different_length_2(self):
         with self.assertRaises(ValueError):
             validate_same_length([1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11])
+
+
+class TestCalculatePairwise2dEuclideanDistances(unittest.TestCase):
+    def test_single_point(self):
+        xs = np.array([0])
+        ys = np.array([0])
+        distances = calculate_pairwise_2d_euclidean_distances(xs, ys)
+        expected = np.array([[0]])
+        np.testing.assert_array_equal(distances, expected)
+
+    def test_two_points(self):
+        xs = np.array([0, 3])
+        ys = np.array([0, 4])
+        distances = calculate_pairwise_2d_euclidean_distances(xs, ys)
+        expected = np.array([[0, 5],
+                             [5, 0]])
+        np.testing.assert_array_almost_equal(distances, expected)
+
+    def test_multiple_points(self):
+        xs = np.array([0, 1, 4])
+        ys = np.array([0, 1, 2])
+        distances = calculate_pairwise_2d_euclidean_distances(xs, ys)
+        expected = np.array([[0, np.sqrt(2), np.sqrt(20)],
+                             [np.sqrt(2), 0, np.sqrt(10)],
+                             [np.sqrt(20), np.sqrt(10), 0]])
+        np.testing.assert_array_almost_equal(distances, expected)
+
+    def test_empty_input(self):
+        xs = np.array([])
+        ys = np.array([])
+        distances = calculate_pairwise_2d_euclidean_distances(xs, ys)
+        expected = np.empty((0, 0))
+        np.testing.assert_array_equal(distances, expected)
+
 
 
 if __name__ == '__main__':

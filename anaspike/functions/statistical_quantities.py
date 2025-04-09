@@ -20,3 +20,16 @@ def radial_average(origin: Tuple[float,float], x_pos: NDArray[np.float64], y_pos
     counts, _ = np.histogram(r, bins=bin_edges)
     return np.divide(sums, counts, out=np.zeros_like(sums), where=counts != 0)
 
+
+def morans_i(data: NDArray[np.float64], weights: NDArray[np.float64]) -> float:
+    if data.ndim != 1:
+        raise ValueError("Data must be a 1D array")
+    n = len(data)
+    if weights.shape != (n, n):
+        raise ValueError("Weights must be a square matrix of shape (n, n), where n is the length of data")
+    w = np.sum(weights, dtype=np.float64)
+    diff = data - np.mean(data)
+    numerator = np.sum(weights * np.outer(diff, diff))
+    denominator = np.sum(diff**2)
+    return (n / w) * (numerator / denominator)
+

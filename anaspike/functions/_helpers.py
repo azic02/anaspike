@@ -45,3 +45,10 @@ def validate_one_dimensional(arr: NDArray[Any]):
     if arr.ndim != 1:
         raise ValueError("Array not one dimensional.")
 
+
+def calculate_pairwise_2d_euclidean_distances(xs: NDArray, ys: NDArray) -> NDArray[np.float64]:
+    validate_one_dimensional(xs)
+    if xs.shape != ys.shape:
+        raise ValueError("The two arrays must have the same shape.")
+    return np.sqrt((xs[:, np.newaxis] - xs[np.newaxis, :])**2 + (ys[:, np.newaxis] - ys[np.newaxis, :])**2)
+

@@ -3,7 +3,9 @@ from unittest.mock import patch, MagicMock
 
 import numpy as np
 
-from anaspike.functions.statistical_quantities import pearson_correlation_offset_data, radial_average
+from anaspike.functions.statistical_quantities import (pearson_correlation_offset_data,
+                                                       radial_average,
+                                                       morans_i)
 
 
 
@@ -188,6 +190,64 @@ class TestRadialAverage(unittest.TestCase):
         
         result = radial_average(origin, x, y, data, bins)
         np.testing.assert_array_almost_equal(result, np.array([1.0, 2.5, 4.0]))
+
+
+class TestMoransI(unittest.TestCase):
+    def test_error_non_1d_data(self):
+        data = np.array([[1, 2], [3, 4]])
+        weights = np.array([[0, 1], [1, 0]])
+        with self.assertRaises(ValueError):
+            morans_i(data, weights)
+
+    def test_error_incompatible_weights(self):
+        data = np.array([1, 2, 3])
+        weights = np.array([[0, 1, 0], [0, 1, 0]])
+        with self.assertRaises(ValueError):
+            morans_i(data, weights)
+
+    def test_chessboard(self):
+        chessboard_data = np.array([[1, 0, 1, 0],
+                                    [0, 1, 0, 1],
+                                    [1, 0, 1, 0],
+                                    [0, 1, 0, 1]], dtype=np.float64).flatten()
+        rook_weights = np.array([[0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+                                 [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
+                                 [0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+                                 [1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                                 [1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+                                 [0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+                                 [0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0],
+                                 [0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+                                 [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1],
+                                 [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1],
+                                 [0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0],
+                                 [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+                                 [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0]], dtype=np.float64)
+        result = morans_i(chessboard_data, rook_weights)
+        expected_result = -1.0
+        self.assertAlmostEqual(result, expected_result)
+
+    def test_random(self):
+        n = 10
+        data = np.random.rand(n)
+        weights = np.random.rand(n, n)
+        result = morans_i(data, weights)
+
+        diff = data - np.mean(data)
+        w = 0.
+        numerator = 0.
+        denominator = 0.
+        for i in range(n):
+            denominator += diff[i]**2
+            for j in range(n):
+                w += weights[i, j]
+                numerator += weights[i, j] * diff[i] * diff[j]
+        expected_result = (n / w) * (numerator / denominator)
+
+        self.assertAlmostEqual(result, expected_result)
 
 
 if __name__ == '__main__':

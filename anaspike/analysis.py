@@ -10,10 +10,12 @@ from anaspike.dataclasses.interval import Interval, Bin, EquidistantBins
 from anaspike.functions.spike_derived_quantities import (firing_rates,
                                                          spike_counts_in_spacetime_region)
 from anaspike.functions.statistical_quantities import (pearson_correlation_offset_data,
-                                                       radial_average)
+                                                       radial_average,
+                                                       morans_i)
 from anaspike.hayleigh import get_autocorr, average_over_interp2d
 from anaspike.sigrid import cross_correlate_masked, get_radial_acorr
-from anaspike.functions._helpers import construct_offset_vectors
+from anaspike.functions._helpers import (construct_offset_vectors,
+                                         calculate_pairwise_2d_euclidean_distances)
 
 
 
@@ -82,6 +84,15 @@ def spike_counts_spatial_autocorrelation_radial_avg(neurons: PopulationData, spi
     offset_vectors = construct_offset_vectors(len(xs), len(ys), margin=20)
     offset_vectors_in_spatial_units = np.array([(origin[0] + xs.bin_width * ov[0], origin[1] + ys.bin_width * ov[1]) for ov in offset_vectors])
     return np.array([radial_average(origin, offset_vectors_in_spatial_units[:,0], offset_vectors_in_spatial_units[:,1], a, radial_bins) for a in spatial_autocorr])
+
+
+def morans_i_evolution(neurons: PopulationData, spike_recorder: SpikeRecorderData, ts: Iterable[Bin], decay_power: float=1.) -> NDArray[np.float64]:
+    fr_over_t = firing_rates_evolution(neurons, spike_recorder, ts)
+    distances = calculate_pairwise_2d_euclidean_distances(neurons.x_pos, neurons.y_pos)
+    np.fill_diagonal(distances, 1.)
+    weights = np.power(distances, -decay_power)
+    np.fill_diagonal(weights, 0.)
+    return np.array([morans_i(fr, weights) for fr in fr_over_t])
 
 
 def hayleighs_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval]) -> NDArray[np.float64]:
