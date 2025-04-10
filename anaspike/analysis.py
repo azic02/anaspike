@@ -3,7 +3,7 @@ from functools import partial
 
 import numpy as np
 from numpy.typing import NDArray
-from scipy.stats import pearsonr, variation
+from scipy.stats import variation
 
 from anaspike.dataclasses.nest_devices import PopulationData, NeuronData, SpikeRecorderData
 from anaspike.dataclasses.interval import Interval, Bin, EquidistantBins
@@ -62,7 +62,7 @@ def spike_gaps_coefficient_of_variation_histogram(population: PopulationData, sp
 def firing_rate_temporal_correlation(reference_neuron: NeuronData, neurons: PopulationData, spike_recorder: SpikeRecorderData, t_bins: Iterable[Bin]) -> NDArray[np.float64]:
     fr = np.array([firing_rates(spike_recorder.get_spike_trains(neurons.ids), t_bin) for t_bin in t_bins]).T
     fr_ref = np.squeeze(np.array([firing_rates(spike_recorder.get_spike_trains(reference_neuron.ids), t_bin) for t_bin in t_bins]))
-    return np.array([pearsonr(fr_ref, fr[n]).statistic for n in range(len(neurons))])
+    return np.array([np.corrcoef(fr_ref, fr[n])[0,1] for n in range(len(neurons))])
 
 
 def pairwise_temporal_correlation_matrix(population: PopulationData, spike_recorder: SpikeRecorderData, t_bins: Sequence[Bin]) -> NDArray[np.float64]:
