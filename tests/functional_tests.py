@@ -12,143 +12,18 @@
 #     name: python3
 # ---
 
-# # Simulation Test
-
-# +
-import os
-
-import matplotlib.pyplot as plt
-import nest
-# -
-
-# ## Parametrisation
-
-# ### neurons
-
-# +
-extent = (2., 2.)
-
-neuron_params = {
-    'C_m': 1.0,                        # membrane capacity (pF)
-    'E_L': 0.,                         # resting membrane potential (mV)
-    'I_e': 0.,                         # external input current (pA)
-    'V_m': 0.,                         # membrane potential (mV)
-    'V_reset': 10.,                    # reset membrane potential after a spike (mV)
-    'V_th': 20.,                       # spike threshold (mV)
-    't_ref': 2.0,                      # refractory period (ms)
-    'tau_m': 20.,                      # membrane time constant (ms)
-    }
-
-
-positions_exc = nest.spatial.grid(
-    shape=[120, 120],
-    extent=extent,
-    edge_wrap=True
-    )
-
-positions_inh = nest.spatial.grid(
-    shape=[60, 60],
-    extent=extent,
-    edge_wrap=True
-    )
-# -
-
-# ### connections
-
-# #### synapses
-
-# +
-w_mean_exc = 1.
-w_mean_inh = -5.
-
-syn_spec_exc = {
-    'synapse_model': 'static_synapse',
-    'delay': 1.5,                      # synaptic transmission delay (ms)
-    'weight': w_mean_exc
-    }
-syn_spec_inh = {
-    'synapse_model': 'static_synapse',
-    'delay': 1.5,                      # synaptic transmission delay (ms)
-    'weight': w_mean_inh
-    }
-# -
-
-# #### connectivity
-
-conn_spec_exc = {
-    'rule': 'pairwise_bernoulli',
-    'p': nest.spatial_distributions.gaussian(nest.spatial.distance, std=0.2),
-    }
-conn_spec_inh = {
-    'rule': 'pairwise_bernoulli',
-    'p': nest.spatial_distributions.gaussian(nest.spatial.distance, std=0.5),
-    }
-
-# ### stimulation
-
-poisson_generator_params = {
-    'rate': 2000.
-    }
-poisson_generator_conn_spec = 'all_to_all'
-poisson_generator_syn_spec = {'weight': w_mean_exc, 'delay': 1.0}
-
-# ## Simulation
-
-nest.ResetKernel()
-nest.rng_seed = 1234
-nest.resolution = 0.1
-nest.local_num_threads = os.cpu_count()
-
-pop_exc = nest.Create('iaf_psc_exp', params=neuron_params, positions=positions_exc)
-pop_inh = nest.Create('iaf_psc_exp', params=neuron_params, positions=positions_inh)
-
-nest.Connect(pop_exc, pop_exc, syn_spec=syn_spec_exc, conn_spec=conn_spec_exc)
-nest.Connect(pop_exc, pop_inh, syn_spec=syn_spec_exc, conn_spec=conn_spec_exc)
-nest.Connect(pop_inh, pop_exc, syn_spec=syn_spec_inh, conn_spec=conn_spec_inh)
-nest.Connect(pop_inh, pop_inh, syn_spec=syn_spec_inh, conn_spec=conn_spec_inh)
-
-nest.PlotTargets(pop_exc[500], pop_exc, probability_parameter=conn_spec_exc['p'], src_size=250, tgt_color='moccasin', tgt_size=20, probability_cmap='Purples')
-plt.show()
-
-nest.PlotTargets(pop_exc[500], pop_inh, probability_parameter=conn_spec_exc['p'], src_size=250, tgt_color='moccasin', tgt_size=20, probability_cmap='Purples')
-plt.show()
-
-nest.PlotTargets(pop_inh[500], pop_exc, probability_parameter=conn_spec_inh['p'], src_size=250, tgt_color='moccasin', tgt_size=20, probability_cmap='Purples')
-plt.show()
-
-nest.PlotTargets(pop_inh[500], pop_inh, probability_parameter=conn_spec_inh['p'], src_size=250, tgt_color='moccasin', tgt_size=20, probability_cmap='Purples')
-plt.show()
-
-poisson_generator = nest.Create('poisson_generator', params=poisson_generator_params)
-nest.Connect(poisson_generator, pop_exc, poisson_generator_conn_spec, poisson_generator_syn_spec)
-nest.Connect(poisson_generator, pop_inh, poisson_generator_conn_spec, poisson_generator_syn_spec)
-
-spike_recorder = nest.Create('spike_recorder')
-nest.Connect(pop_exc, spike_recorder)
-nest.Connect(pop_inh, spike_recorder)
-
-t_sim = 10000.
-nest.Simulate(t_sim)
-
 # # Analysis Test
 
-# +
 import numpy as np
 import matplotlib.pyplot as plt
 from IPython.display import HTML
 
-from anaspike.dataclasses.interval import Interval
-
 # +
 from pathlib import Path
 from anaspike.dataclasses import SimulationData
-from anaspike.dataclasses.nest_devices import PopulationData, SpikeRecorderData
 
-simulation_data = SimulationData(
-    populations={'exc': PopulationData.from_pynest(pop_exc), 'inh': PopulationData.from_pynest(pop_inh)},
-    spike_recorder=SpikeRecorderData.from_pynest(spike_recorder)
-)
-
+test_data_path = Path('./test_data.h5')
+simulation_data = SimulationData.load(test_data_path)
 populations = simulation_data.populations
 spike_recorder = simulation_data.spike_recorder
 # -
@@ -162,6 +37,7 @@ fig, ax = plt.subplots(figsize=(14, 4))
 spike_raster_plot(ax, spike_recorder.times, spike_recorder.senders, markersize=1.)
 
 # +
+from anaspike.dataclasses.interval import Interval
 from anaspike.analysis import intra_population_average_firing_rate_evolution
 from anaspike.visualization import plot_intra_population_average_firing_rate_evolution
 

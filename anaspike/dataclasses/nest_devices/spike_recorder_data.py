@@ -20,11 +20,6 @@ class SpikeRecorderData:
         validate_same_length(self.senders, self.times)
 
     @classmethod
-    def from_pynest(cls, spike_recorder: 'nest.NodeCollection') -> 'SpikeRecorderData':
-        return cls(senders=spike_recorder.events['senders'],
-                   times=spike_recorder.events['times'])
-
-    @classmethod
     def from_nest_ascii_backend(cls, filepaths: Iterable[Path]) -> 'SpikeRecorderData':
         return cls(senders=np.hstack([np.loadtxt(p, delimiter='\t', skiprows=3, usecols=(0,), dtype=np.int64) for p in filepaths]),
                    times=np.hstack([np.loadtxt(p, delimiter='\t', skiprows=3, usecols=(1,), dtype=np.float64) for p in filepaths]))

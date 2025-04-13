@@ -4,7 +4,6 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray
 import h5py
-import nest
 
 from ...functions._helpers import validate_one_dimensional, validate_same_length
 
@@ -15,13 +14,6 @@ class PopulationData:
     ids: NDArray[np.int64]
     x_pos: NDArray[np.float64]
     y_pos: NDArray[np.float64]
-
-    @classmethod
-    def from_pynest(cls, node_collection: nest.NodeCollection) -> 'PopulationData':
-        return cls(ids=np.array(node_collection.get('global_id'), dtype=np.int64),
-                   x_pos=np.array(nest.GetPosition(node_collection), dtype=np.float64)[:,0],
-                   y_pos=np.array(nest.GetPosition(node_collection), dtype=np.float64)[:,1],
-                   )
 
     @classmethod
     def from_hdf5(cls, entity: Union[h5py.Group, h5py.File]) -> 'PopulationData':
