@@ -86,13 +86,23 @@ def spike_counts_spatial_autocorrelation_radial_avg(neurons: PopulationData, spi
     return np.array([radial_average(origin, offset_vectors_in_spatial_units[:,0], offset_vectors_in_spatial_units[:,1], a, radial_bins) for a in spatial_autocorr])
 
 
-def morans_i_evolution(neurons: PopulationData, spike_recorder: SpikeRecorderData, ts: Iterable[Bin], decay_power: float=1.) -> NDArray[np.float64]:
-    fr_over_t = firing_rates_evolution(neurons, spike_recorder, ts)
-    distances = calculate_pairwise_2d_euclidean_distances(neurons.x_pos, neurons.y_pos)
+def morans_i_from_firing_rates_evolution(x_pos: NDArray[np.float64], y_pos: NDArray[np.float64], fr_over_t: NDArray[np.float64], decay_power: float=1.) -> NDArray[np.float64]:
+    if x_pos.shape != y_pos.shape:
+        raise ValueError("x_pos and y_pos must have the same shape")
+    if fr_over_t.ndim != 2:
+        raise ValueError("fr_over_t must be a 2D array")
+    if fr_over_t.shape[1] != x_pos.shape[0]:
+        raise ValueError("First dim of fr_over_t must match x_pos")
+    distances = calculate_pairwise_2d_euclidean_distances(x_pos, y_pos)
     np.fill_diagonal(distances, 1.)
     weights = np.power(distances, -decay_power)
     np.fill_diagonal(weights, 0.)
     return np.array([morans_i(fr, weights) for fr in fr_over_t])
+
+
+def morans_i_evolution(neurons: PopulationData, spike_recorder: SpikeRecorderData, ts: Iterable[Bin], decay_power: float=1.) -> NDArray[np.float64]:
+    fr_over_t = firing_rates_evolution(neurons, spike_recorder, ts)
+    return morans_i_from_firing_rates_evolution(neurons.x_pos, neurons.y_pos, fr_over_t, decay_power)
 
 
 def hayleighs_spatial_autocorrelation(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: Iterable[Interval], ys: Iterable[Interval], ts: Iterable[Interval]) -> NDArray[np.float64]:
