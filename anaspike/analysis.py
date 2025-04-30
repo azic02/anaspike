@@ -59,10 +59,20 @@ def spike_gaps_coefficient_of_variation_histogram(population: PopulationData, sp
     return (bin_vals, bin_counts, bin_edges)
 
 
+def temporal_correlation_from_firing_rates(ref_firing_rate: NDArray[np.float64], firing_rates: NDArray[np.float64]) -> NDArray[np.float64]:
+    if ref_firing_rate.ndim != 1:
+        raise ValueError("ref_firing_rate must be a 1D array")
+    if firing_rates.ndim != 2:
+        raise ValueError("firing_rates must be a 2D array")
+    if firing_rates.shape[1] != ref_firing_rate.shape[0]:
+        raise ValueError("First dim of firing_rates must match ref_firing_rate")
+    return np.array([np.corrcoef(ref_firing_rate, fr)[0, 1] for fr in firing_rates])
+
+
 def firing_rate_temporal_correlation(reference_neuron: NeuronData, neurons: PopulationData, spike_recorder: SpikeRecorderData, t_bins: Iterable[Bin]) -> NDArray[np.float64]:
     fr = np.array([firing_rates(spike_recorder.get_spike_trains(neurons.ids), t_bin) for t_bin in t_bins]).T
     fr_ref = np.squeeze(np.array([firing_rates(spike_recorder.get_spike_trains(reference_neuron.ids), t_bin) for t_bin in t_bins]))
-    return np.array([np.corrcoef(fr_ref, fr[n])[0,1] for n in range(len(neurons))])
+    return temporal_correlation_from_firing_rates(fr_ref, fr)
 
 
 def pairwise_temporal_correlation_matrix(population: PopulationData, spike_recorder: SpikeRecorderData, t_bins: Sequence[Bin]) -> NDArray[np.float64]:
