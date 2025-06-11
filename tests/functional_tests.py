@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.16.7
+#       jupytext_version: 1.17.2
 #   kernelspec:
 #     display_name: Python 3 (ipykernel)
 #     language: python
@@ -38,10 +38,11 @@ spike_raster_plot(ax, spike_recorder.times, spike_recorder.senders, markersize=1
 
 # +
 from anaspike.dataclasses.interval import Interval
+from anaspike.dataclasses.histogram import EquiBins
 from anaspike.analysis import intra_population_average_firing_rate_evolution
 from anaspike.visualization import plot_intra_population_average_firing_rate_evolution
 
-t_bins = Interval(0., 2000.).bin(size=10.)
+t_bins = EquiBins.from_interval_with_median_values(Interval(0., 2000.), size=10.)
 names, avgs, stds = intra_population_average_firing_rate_evolution(populations, spike_recorder, t_bins)
 
 fig, ax = plt.subplots(figsize=(14, 4))
@@ -59,9 +60,9 @@ t_sim = 10000.
 
 n_spatial_bins = 50
 
-t_bins = Interval(100., t_sim).bin(size=500.)
-x_bins = Interval(-extent / 2., extent / 2.).bin(n_spatial_bins)
-y_bins = Interval(-extent / 2., extent / 2.).bin(n_spatial_bins)
+t_bins = EquiBins.from_interval_with_median_values(Interval(100., t_sim), size=500.)
+x_bins = EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins)
+y_bins = EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins)
 
 spatial_bin_size = extent / n_spatial_bins
 time_vals = [t_bin.value for t_bin in t_bins]
@@ -196,7 +197,7 @@ HTML(ani.to_jshtml())
 from anaspike.analysis import spike_counts_spatial_autocorrelation_radial_avg
 from anaspike.visualization import animate_spike_counts_spatial_autocorrelation_radial_avg
 
-radial_bins = Interval(0., extent / 2).bin(size=x_bins[0].width)
+radial_bins = EquiBins.from_interval_with_median_values(Interval(0., extent / 2), size=x_bins[0].width)
 spatial_corr_radial_avg = spike_counts_spatial_autocorrelation_radial_avg(pop, spike_recorder, x_bins, y_bins, t_bins, origin, radial_bins)
 
 fig, ax = plt.subplots()

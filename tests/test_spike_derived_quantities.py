@@ -8,6 +8,7 @@ from anaspike.functions.spike_derived_quantities import (spike_counts,
                                                          spike_counts_in_spacetime_region)
 from anaspike.dataclasses import SpikeTrainArray
 from anaspike.dataclasses.interval import Interval
+from anaspike.dataclasses.histogram import EquiBins
 
 
 
@@ -94,7 +95,7 @@ class TestFiringRates(SharedSetup):
 class TestFiringRatesOverTime(SharedSetup):
     def setUp(self):
         super().setUp()
-        self.times = Interval(0., 50.).bin(5)
+        self.times = EquiBins.from_interval_with_median_values(Interval(0., 50.), 5)
 
     def test_all_neurons(self):
         rates = np.array([firing_rates(self.spike_trains, t_bin) for t_bin in self.times]).T

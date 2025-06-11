@@ -6,7 +6,8 @@ from numpy.typing import NDArray
 from scipy.stats import variation
 
 from anaspike.dataclasses.nest_devices import PopulationData, NeuronData, SpikeRecorderData
-from anaspike.dataclasses.interval import Interval, Bin, EquidistantBins
+from anaspike.dataclasses.interval import Interval, Bin
+from anaspike.dataclasses.histogram import EquiBins
 from anaspike.functions.spike_derived_quantities import (firing_rates,
                                                          spike_counts_in_spacetime_region)
 from anaspike.functions.statistical_quantities import (pearson_correlation_offset_data,
@@ -28,7 +29,7 @@ def time_avg_firing_rates_histogram(population: PopulationData, spike_recorder: 
     spike_trains = spike_recorder.get_spike_trains(population.ids)
     time_avg_firing_rates = firing_rates(spike_trains, t_interval)
 
-    firing_rate_bins = Interval(min(time_avg_firing_rates), max(time_avg_firing_rates)).bin(nbins)
+    firing_rate_bins = EquiBins.from_interval_with_median_values(Interval(min(time_avg_firing_rates), max(time_avg_firing_rates)), nbins)
     bin_edges = np.array([bin_.start for bin_ in firing_rate_bins] + [firing_rate_bins[-1].end])
 
     bin_vals = np.array([bin_.value for bin_ in firing_rate_bins])
@@ -89,7 +90,7 @@ def spike_counts_spatial_autocorrelation(neurons: PopulationData, spike_recorder
     return np.array([pearson_correlation_offset_data(m, m, offset_vectors) for m in counts_map_for_each_t])
 
 
-def spike_counts_spatial_autocorrelation_radial_avg(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: EquidistantBins, ys: EquidistantBins, ts: Iterable[Interval], origin: Tuple[float,float], radial_bins: Sequence[Bin]) -> NDArray[np.float64]:
+def spike_counts_spatial_autocorrelation_radial_avg(neurons: PopulationData, spike_recorder: SpikeRecorderData, xs: EquiBins, ys: EquiBins, ts: Iterable[Interval], origin: Tuple[float,float], radial_bins: Sequence[Bin]) -> NDArray[np.float64]:
     spatial_autocorr = spike_counts_spatial_autocorrelation(neurons, spike_recorder, xs, ys, ts)
     offset_vectors = construct_offset_vectors(len(xs), len(ys), margin=20)
     offset_vectors_in_spatial_units = np.array([(origin[0] + xs.bin_width * ov[0], origin[1] + ys.bin_width * ov[1]) for ov in offset_vectors])
