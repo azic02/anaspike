@@ -213,6 +213,44 @@ class TestEquiBinsFromIntervalWithMedianValues(unittest.TestCase):
         np.testing.assert_array_equal(result.bin_values, expected_values)
 
 
+class TestEquiBinsFromIntervalStrWithMedianValues(unittest.TestCase):
+    def test_valid_format_n(self):
+        result = EquiBins.from_interval_str_with_median_values("0,10,n5")
+        expected_edges = np.array([0, 2, 4, 6, 8, 10])
+        expected_values = np.array([1, 3, 5, 7, 9])
+
+        np.testing.assert_array_equal(result.bin_edges, expected_edges)
+        np.testing.assert_array_equal(result.bin_values, expected_values)
+
+    def test_valid_format_size(self):
+        result = EquiBins.from_interval_str_with_median_values("0,10,s2")
+        expected_edges = np.array([0, 2, 4, 6, 8])
+        expected_values = np.array([1, 3, 5, 7])
+
+        np.testing.assert_array_equal(result.bin_edges, expected_edges)
+        np.testing.assert_array_equal(result.bin_values, expected_values)
+
+    def test_invalid_spacer(self):
+        with self.assertRaises(ValueError):
+            EquiBins.from_interval_str_with_median_values("0-10-5")
+
+    def test_invalid_values(self):
+        with self.assertRaises(ValueError):
+            EquiBins.from_interval_str_with_median_values("a,b,c")
+
+    def test_invalid_arguments_number(self):
+        with self.assertRaises(ValueError):
+            EquiBins.from_interval_str_with_median_values("0,10,n5,s2")
+
+    def test_invalid_n_type(self):
+        with self.assertRaises(ValueError):
+            EquiBins.from_interval_str_with_median_values("0,10,n5.5")
+
+    def test_invalid_size_type(self):
+        with self.assertRaises(ValueError):
+            EquiBins.from_interval_str_with_median_values("0,10,sx")
+
+
 class TestEquiBins(unittest.TestCase):
     def setUp(self):
         edges = np.array([0, 2, 4, 6, 8, 10])

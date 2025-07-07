@@ -98,6 +98,27 @@ class EquiBins(ContigBins):
         edges = interval.discretize(n_edges, size)
         return cls.with_median_values(edges)
 
+    @classmethod
+    def from_interval_str_with_median_values(cls, equi_bins_str: str):
+        parts = equi_bins_str.split(',')
+        if len(parts) != 3:
+            raise ValueError("Interval string must be in the format '<start>,<end>,n<n_bins>' or '<start>,<end>,s<bin_size>'")
+        interval_str = ','.join(parts[:2])
+        interval = Interval.from_str(interval_str)
+
+        bin_spec_str = parts[2]
+        if len(bin_spec_str) <= 1:
+            raise ValueError("Invalid bin specification")
+        if bin_spec_str[0] == 'n':
+            n = int(bin_spec_str[1:])
+            size = None
+        elif bin_spec_str[0] == 's':
+            n = None
+            size = float(bin_spec_str[1:])
+        else:
+            raise ValueError("Bin specification must start with 'n' or 's'")
+        return cls.from_interval_with_median_values(interval, n, size)
+
     @property
     def bin_width(self) -> float:
         return self[0].width

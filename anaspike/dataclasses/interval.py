@@ -12,6 +12,14 @@ class Interval:
         self.__start = start
         self.__end = end
 
+    @classmethod
+    def from_str(cls, interval_str: str) -> 'Interval':
+        parts = interval_str.split(',')
+        if len(parts) != 2:
+            raise ValueError("Interval string must be in the format '<start>,<end>'")
+        start, end = map(float, parts)
+        return cls(start, end)
+
     @property
     def start(self) -> float:
         return self.__start

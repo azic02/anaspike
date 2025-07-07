@@ -50,6 +50,21 @@ class TestInterval(unittest.TestCase):
             self.assertEqual(r, e)
 
 
+class TestIntervalFromStr(unittest.TestCase):
+    def test_from_str_valid(self):
+        interval = Interval.from_str("0,10")
+        self.assertEqual(interval.start, 0)
+        self.assertEqual(interval.end, 10)
+
+    def test_from_str_invalid_format(self):
+        with self.assertRaises(ValueError):
+            Interval.from_str("0-10")
+
+    def test_from_str_invalid_values(self):
+        with self.assertRaises(ValueError):
+            Interval.from_str("a,b")
+
+
 class TestBin(unittest.TestCase):
     def setUp(self):
         self.bin = Bin(0, 10, 5)
