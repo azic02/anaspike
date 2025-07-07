@@ -146,6 +146,20 @@ class TestContigBins(unittest.TestCase):
         with self.assertRaises(StopIteration):
             next(bins_iter)
 
+    def test_hdf5_conversion(self):
+        import h5py
+
+        with h5py.File('test_bins.h5', 'w') as f:
+            out_group = f.create_group('bins')
+            self.bins.to_hdf5(out_group)
+
+        with h5py.File('test_bins.h5', 'r') as f:
+            in_group = f['bins']
+            loaded_bins = ContigBins.from_hdf5(in_group)
+
+        np.testing.assert_array_equal(loaded_bins.bin_edges, self.bins.bin_edges)
+        np.testing.assert_array_equal(loaded_bins.bin_values, self.bins.bin_values)
+
 
 class TestEquiBinsInit(unittest.TestCase):
     def test_invalid_width(self):
@@ -264,6 +278,21 @@ class TestHistogram(unittest.TestCase):
     def test_counts(self):
         expected_counts = np.array([10, 20, 30, 40, 50])
         np.testing.assert_array_equal(self.histogram.counts, expected_counts)
+
+    def test_hdf5_conversion(self):
+        import h5py
+
+        with h5py.File('test_histogram.h5', 'w') as f:
+            out_group = f.create_group('histogram')
+            self.histogram.to_hdf5(out_group)
+
+        with h5py.File('test_histogram.h5', 'r') as f:
+            in_group = f['histogram']
+            loaded_histogram = Histogram.from_hdf5(in_group)
+
+        np.testing.assert_array_equal(loaded_histogram.bins.bin_edges, self.histogram.bins.bin_edges)
+        np.testing.assert_array_equal(loaded_histogram.bins.bin_values, self.histogram.bins.bin_values)
+        np.testing.assert_array_equal(loaded_histogram.counts, self.histogram.counts)
 
 
 if __name__ == '__main__':

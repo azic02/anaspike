@@ -2,6 +2,7 @@ from typing import Optional, Iterator, Sequence
 
 import numpy as np
 from numpy.typing import NDArray
+import h5py
 
 from .interval import Interval, Bin
 
@@ -47,6 +48,16 @@ class ContigBins:
     def with_median_values(cls, edges: NDArray[np.float64]):
         values = edges[:-1] + np.diff(edges) / 2
         return cls(edges, values)
+
+    @classmethod
+    def from_hdf5(cls, hdf5_group: h5py.Group):
+        edges = np.array(hdf5_group["edges"][:])
+        values = np.array(hdf5_group["values"][:])
+        return cls(edges, values)
+
+    def to_hdf5(self, hdf5_group: h5py.Group):
+        hdf5_group.create_dataset("edges", data=self.__edges)
+        hdf5_group.create_dataset("values", data=self.__values)
 
     @property
     def bin_edges(self) -> NDArray[np.float64]:
@@ -104,6 +115,17 @@ class Histogram:
     def construct_by_counting(cls, bins: ContigBins, data: NDArray[np.float64]):
         counts, _ = np.histogram(data, bins=bins.bin_edges)
         return cls(bins, counts)
+
+    @classmethod
+    def from_hdf5(cls, hdf5_group: h5py.Group):
+        bins = ContigBins.from_hdf5(hdf5_group["bins"])
+        counts = np.array(hdf5_group["counts"][:])
+        return cls(bins, counts)
+
+    def to_hdf5(self, hdf5_group: h5py.Group):
+        bins_group = hdf5_group.create_group("bins")
+        self.__bins.to_hdf5(bins_group)
+        hdf5_group.create_dataset("counts", data=self.__counts)
 
     @property
     def bins(self) -> ContigBins:
