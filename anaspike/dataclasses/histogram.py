@@ -3,6 +3,7 @@ from typing import Optional, Iterator, Sequence
 import numpy as np
 from numpy.typing import NDArray
 import h5py
+from matplotlib.axes import Axes
 
 from .interval import Interval, Bin
 
@@ -163,4 +164,9 @@ class Histogram:
     @property
     def counts(self) -> NDArray[np.int64]:
         return self.__counts
+
+    def plot(self, ax: Axes, **kwargs):
+        ax.bar(self.bin_values, self.counts, width=np.diff(self.bin_edges), align='center', **kwargs)
+        ax.set_ylabel('Counts')
+        return ax
 
