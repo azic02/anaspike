@@ -47,6 +47,14 @@ class TestPearsonCorrelationOffsetData(unittest.TestCase):
         self.assertLess(corr[2], 1.0)
         self.assertLess(corr[3], 1.0)
 
+    def test_1d_correlation_against_np_corrcoeff(self):
+        n = 100
+        data1 = np.random.rand(n)
+        data2 = np.random.rand(n)
+        offset_vectors = np.array([(i,) for i in range(n - 1)])
+        corr = pearson_correlation_offset_data(data1, data2, offset_vectors)
+        expected_corr = [np.corrcoef(data1, data2)[0, 1]] + [np.corrcoef(data1[i:], data2[:-i])[0, 1] for (i, ) in offset_vectors[1:]]
+        np.testing.assert_array_almost_equal(corr, expected_corr)
 
     def test_2d_correlation_gaussian(self):
         delta = 0.2
