@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='anaspike',
-    version='0.2.0',
+    version='0.3.0',
     packages=find_packages(),
     install_requires=requirements,
     description='An analysis package for modular spiking network models',

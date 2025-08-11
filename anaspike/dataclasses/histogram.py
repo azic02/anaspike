@@ -65,8 +65,16 @@ class ContigBins:
         return self.__edges
 
     @property
+    def edges(self) -> NDArray[np.float64]:
+        return self.bin_edges
+
+    @property
     def bin_values(self) -> NDArray[np.float64]:
         return self.__values
+
+    @property
+    def values(self) -> NDArray[np.float64]:
+        return self.values
 
     def __len__(self) -> int:
         return len(self.__values)
