@@ -74,7 +74,7 @@ class ContigBins:
 
     @property
     def values(self) -> NDArray[np.float64]:
-        return self.values
+        return self.bin_values
 
     def __len__(self) -> int:
         return len(self.__values)
