@@ -5,8 +5,11 @@ with open('requirements.txt') as f:
 
 setup(
     name='anaspike',
-    version='0.2.0',
+    version='0.2.1',
     packages=find_packages(),
+    package_data={
+        'anaspike': ['anaspike/py.py.typed']
+        },
     install_requires=requirements,
     description='An analysis package for modular spiking network models',
     long_description=open('README.md').read(),
