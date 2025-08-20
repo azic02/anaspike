@@ -31,6 +31,8 @@ def _save_supported_base_type(hdf5_obj: h5py.Group, name: str, value: SupportedB
             ds = hdf5_obj.create_dataset(name, data=value) #type: ignore
         elif value.dtype == np.object_:
             ds = hdf5_obj.create_dataset(name, data=value, dtype=h5py.vlen_dtype(np.float64)) #type: ignore
+        else:
+            raise ValueError(f"Unsupported numpy array dtype '{value.dtype}' for saving to HDF5.")
         ds.attrs.create('__class__', 'numpy.ndarray') #type: ignore
     else:
         raise ValueError(f"Unsupported variable '{name}' of type '{type(value)}' for saving to HDF5.")

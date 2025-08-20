@@ -104,3 +104,16 @@ class TestHDF5Mixin(unittest.TestCase):
         for original, loaded in zip(instance.arrays, loaded_instance.arrays):
             np.testing.assert_array_equal(original, loaded)
 
+    def test_to_hdf5_ndarray_unsupported_dtype(self):
+        import numpy as np
+        from numpy.typing import NDArray
+
+        class DummyClass(HDF5Mixin):
+            def __init__(self, array: NDArray[np.str_]):
+                self.array = array
+
+        instance = DummyClass(array=np.array(['a', 'b', 'c'], dtype=np.str_))
+        with h5py.File('test.h5', 'w') as f:
+            with self.assertRaises(ValueError):
+                instance.to_hdf5(f, 'dummy')
+
