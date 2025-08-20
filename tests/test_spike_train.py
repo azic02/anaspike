@@ -34,11 +34,9 @@ class TestSpikeTrainArray(unittest.TestCase):
                                         np.array([4., 5.])])
 
         with h5py.File('test_spike_trains.h5', 'w') as f:
-            f.create_dataset('spike_trains', data=spike_trains,
-                             dtype=h5py.vlen_dtype(np.float64))
-
+            spike_trains.to_hdf5(f, 'spike_trains')
         with h5py.File('test_spike_trains.h5', 'r') as f:
-            loaded_trains = SpikeTrainArray(f['spike_trains'])
+            loaded_trains = SpikeTrainArray.from_hdf5(f['spike_trains'])
 
         self.assertEqual(len(loaded_trains), len(spike_trains))
         self.assertEqual(loaded_trains.dtype, np.dtype('O'))
