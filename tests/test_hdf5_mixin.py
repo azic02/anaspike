@@ -7,6 +7,33 @@ from anaspike.hdf5_mixin import HDF5Mixin
 
 
 class TestHDF5Mixin(unittest.TestCase):
+    def test_from_hdf5_missing_key(self):
+        class DummyClass(HDF5Mixin):
+            def __init__(self, value: int):
+                self.value = value
+
+        class DummyClass2(HDF5Mixin):
+            def __init__(self, value: int):
+                self.value2 = value
+
+        instance = DummyClass(value=42)
+        with h5py.File('test.h5', 'w') as f:
+            instance.to_hdf5(f, 'dummy')
+
+        with self.assertRaises(KeyError):
+            DummyClass2.from_hdf5(f['dummy'])
+
+    def test_to_hdf5_missing_member(self):
+        class DummyClass(HDF5Mixin):
+            def __init__(self, non_matching_arg: int):
+                self.value = non_matching_arg
+
+        instance = DummyClass(non_matching_arg=42)
+
+        with h5py.File('test.h5', 'w') as f:
+            with self.assertRaises(AttributeError):
+                instance.to_hdf5(f, 'dummy')
+
     def test_int_member(self):
         class DummyClass(HDF5Mixin):
             def __init__(self, value: int):

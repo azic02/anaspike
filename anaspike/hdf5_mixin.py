@@ -18,7 +18,7 @@ def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
     if class_name == 'int':
         return int(hdf5_obj[()]) #type: ignore
     elif class_name == 'numpy.ndarray':
-        return np.array(hdf5_obj[:], dtype=np.float64) #type: ignore
+        return np.array(hdf5_obj[:]) #type: ignore
     else:
         raise ValueError(f"Unsupported class type '{class_name}' found in HDF5 object.")
 
@@ -50,11 +50,15 @@ class HDF5Mixin:
             if k in hdf5_obj:
                 v = hdf5_obj[k]
                 kwargs[k] = _load_supported_base_type(cast(h5py.Dataset, v))
+            else:
+                raise KeyError(f"Missing required key '{k}' in HDF5 object.")
         return cls(**kwargs)
 
     def to_hdf5(self, hdf5_obj: Union[h5py.File, h5py.Group], name: str) -> None:
         group = hdf5_obj.create_group(name) # type: ignore
         for k in self.init_args:
+            if not hasattr(self, k):
+                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{k}'")
             v = getattr(self, k)
             _save_supported_base_type(group, k, v)
 
