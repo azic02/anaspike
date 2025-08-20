@@ -58,7 +58,9 @@ class HDF5Mixin:
         group = hdf5_obj.create_group(name) # type: ignore
         for k in self.init_args:
             if not hasattr(self, k):
-                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{k}'")
+                k = f'_{k}'
+                if not hasattr(self, k):
+                    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{k}'")
             v = getattr(self, k)
             _save_supported_base_type(group, k, v)
 
