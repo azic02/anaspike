@@ -7,7 +7,7 @@ from numpy.typing import NDArray
 
 
 
-SupportedBaseTypes = Union[int, NDArray[np.int64], NDArray[np.float64], NDArray[np.object_],
+SupportedBaseTypes = Union[float, int, NDArray[np.int64], NDArray[np.float64], NDArray[np.object_],
                            'HDF5Mixin']
 
 
@@ -22,6 +22,8 @@ def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
    
     if class_name == 'int':
         return int(hdf5_obj[()]) #type: ignore
+    elif class_name == 'float':
+        return float(hdf5_obj[()])
     elif class_name == 'numpy.ndarray':
         return np.array(hdf5_obj[:]) #type: ignore
     elif class_name in __REGISTRY:
@@ -34,6 +36,9 @@ def _save_supported_base_type(hdf5_obj: h5py.Group, name: str, value: SupportedB
     if isinstance(value, int):
         ds = hdf5_obj.create_dataset(name, data=value) #type: ignore
         ds.attrs.create('__class__', 'int') #type: ignore
+    elif isinstance(value, float):
+        ds = hdf5_obj.create_dataset(name, data=value)
+        ds.attrs.create('__class__', 'float') #type: ignore
     elif isinstance(value, np.ndarray):
         if value.dtype == np.float64:
             ds = hdf5_obj.create_dataset(name, data=value) #type: ignore
