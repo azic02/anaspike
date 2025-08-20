@@ -88,8 +88,8 @@ class TestContigBinsWithMedianValues(unittest.TestCase):
 
 class TestContigBins(unittest.TestCase):
     def setUp(self):
-        edges = np.array([0, 2, 4, 6, 8, 10])
-        values = np.array([1, 3, 5, 7, 9])
+        edges = np.array([0, 2, 4, 6, 8, 10], dtype=np.float64)
+        values = np.array([1, 3, 5, 7, 9], dtype=np.float64)
         self.bins = ContigBins(edges, values)
 
     def test_bin_edges(self):
@@ -149,13 +149,11 @@ class TestContigBins(unittest.TestCase):
     def test_hdf5_conversion(self):
         import h5py
 
-        with h5py.File('test_bins.h5', 'w') as f:
-            out_group = f.create_group('bins')
-            self.bins.to_hdf5(out_group)
+        with h5py.File('test_bins.h5', 'w') as f_out:
+            self.bins.to_hdf5(f_out, 'bins')
 
-        with h5py.File('test_bins.h5', 'r') as f:
-            in_group = f['bins']
-            loaded_bins = ContigBins.from_hdf5(in_group)
+        with h5py.File('test_bins.h5', 'r') as f_in:
+            loaded_bins = ContigBins.from_hdf5(f_in['bins'])
 
         np.testing.assert_array_equal(loaded_bins.bin_edges, self.bins.bin_edges)
         np.testing.assert_array_equal(loaded_bins.bin_values, self.bins.bin_values)
@@ -319,15 +317,10 @@ class TestHistogram(unittest.TestCase):
 
     def test_hdf5_conversion(self):
         import h5py
-
-        with h5py.File('test_histogram.h5', 'w') as f:
-            out_group = f.create_group('histogram')
-            self.histogram.to_hdf5(out_group)
-
-        with h5py.File('test_histogram.h5', 'r') as f:
-            in_group = f['histogram']
-            loaded_histogram = Histogram.from_hdf5(in_group)
-
+        with h5py.File('test_histogram.h5', 'w') as f_out:
+            self.histogram.to_hdf5(f_out, 'histogram')
+        with h5py.File('test_histogram.h5', 'r') as f_in:
+            loaded_histogram = Histogram.from_hdf5(f_in['histogram'])
         np.testing.assert_array_equal(loaded_histogram.bins.bin_edges, self.histogram.bins.bin_edges)
         np.testing.assert_array_equal(loaded_histogram.bins.bin_values, self.histogram.bins.bin_values)
         np.testing.assert_array_equal(loaded_histogram.counts, self.histogram.counts)
