@@ -49,7 +49,7 @@ class TestHDF5Mixin(unittest.TestCase):
 
         self.assertEqual(instance.value, loaded_instance.value)
 
-    def test_ndarray_member(self):
+    def test_ndarray_dtype_float_member(self):
         import numpy as np
         from numpy.typing import NDArray
         class DummyClass(HDF5Mixin):
@@ -66,6 +66,27 @@ class TestHDF5Mixin(unittest.TestCase):
             loaded_instance = DummyClass.from_hdf5(f['dummy'])
 
         np.testing.assert_array_equal(instance.array, loaded_instance.array)
+        self.assertIs(loaded_instance.array.dtype, np.dtype(np.float64))
+
+    def test_ndarray_dtype_int_member(self):
+        import numpy as np
+        from numpy.typing import NDArray
+
+        class DummyClass(HDF5Mixin):
+            def __init__(self, array: NDArray[np.int64]):
+                self.array = array
+
+        array_data = np.array([1, 2, 3], dtype=np.int64)
+        instance = DummyClass(array=array_data)
+
+        with h5py.File('test.h5', 'w') as f:
+            instance.to_hdf5(f, 'dummy')
+
+        with h5py.File('test.h5', 'r') as f:
+            loaded_instance = DummyClass.from_hdf5(f['dummy'])
+
+        np.testing.assert_array_equal(instance.array, loaded_instance.array)
+        self.assertIs(loaded_instance.array.dtype, np.dtype(np.int64))
 
     def test_underscored_member(self):
         class DummyClass(HDF5Mixin):
