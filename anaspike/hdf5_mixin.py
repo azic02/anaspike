@@ -57,10 +57,11 @@ class HDF5Mixin:
     def to_hdf5(self, hdf5_obj: Union[h5py.File, h5py.Group], name: str) -> None:
         group = hdf5_obj.create_group(name) # type: ignore
         for k in self.init_args:
-            if not hasattr(self, k):
-                k = f'_{k}'
-                if not hasattr(self, k):
-                    raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{k}'")
-            v = getattr(self, k)
+            k_mod = k
+            if not hasattr(self, k_mod):
+                k_mod = f'_{k_mod}'
+            if not hasattr(self, k_mod):
+                raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{k}'")
+            v = getattr(self, k_mod)
             _save_supported_base_type(group, k, v)
 

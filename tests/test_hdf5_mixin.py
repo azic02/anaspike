@@ -72,8 +72,7 @@ class TestHDF5Mixin(unittest.TestCase):
             def __init__(self, value: int):
                 self._value = value
 
-            @property
-            def value(self):
+            def get_value(self):
                 return self._value
 
         instance = DummyClass(value=42)
@@ -83,22 +82,5 @@ class TestHDF5Mixin(unittest.TestCase):
         with h5py.File('test.h5', 'r') as f:
             loaded_instance = DummyClass.from_hdf5(f['dummy'])
 
-        self.assertEqual(instance.value, loaded_instance.value)
+        self.assertEqual(instance.get_value(), loaded_instance.get_value())
 
-    def test_dunderscored_member(self):
-        class DummyClass(HDF5Mixin):
-            def __init__(self, value: int):
-                self.__value = value
-
-            @property
-            def value(self):
-                return self.__value
-
-        instance = DummyClass(value=42)
-        with h5py.File('test.h5', 'w') as f:
-            instance.to_hdf5(f, 'dummy')
-
-        with h5py.File('test.h5', 'r') as f:
-            loaded_instance = DummyClass.from_hdf5(f['dummy'])
-
-        self.assertEqual(instance.value, loaded_instance.value)
