@@ -90,6 +90,9 @@ class EquiBins(ContigBins):
         if not np.all(np.isclose(np.diff(edges), edges[1] - edges[0], rtol=rtol, atol=atol)):
             raise ValueError("All bins must have the same width.")
 
+        self._rtol = rtol
+        self._atol = atol
+
         super().__init__(edges, values)
 
     @classmethod
