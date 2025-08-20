@@ -26,7 +26,7 @@ class TestSpikeTrainArray(unittest.TestCase):
         spike_trains = SpikeTrainArray([np.array([1., 2., 3.])])
         self.assertEqual(spike_trains.dtype, np.dtype('O'))
         self.assertIsInstance(spike_trains[0], np.ndarray)
-        #self.assertEqual(spike_trains[0].dtype, np.float64)
+        self.assertEqual(spike_trains[0].dtype, np.float64)
 
     def test_hdf5_conversion(self):
         import h5py
