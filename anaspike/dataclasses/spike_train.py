@@ -2,11 +2,13 @@ import numpy as np
 from numpy.typing import NDArray, DTypeLike
 from typing import Union, Collection
 
+from anaspike.hdf5_mixin import HDF5Mixin
+
 
 
 SpikeTrain = NDArray[np.float64]
 
-class SpikeTrainArray:
+class SpikeTrainArray(HDF5Mixin):
     def __init__(self, spike_trains: Collection[SpikeTrain]):
         self._data = np.asarray(spike_trains, dtype=object)
 
@@ -20,6 +22,10 @@ class SpikeTrainArray:
 
     def __len__(self):
         return len(self._data)
+
+    def __iter__(self):
+        for train in self._data:
+            yield np.asarray(train, dtype=np.float64)
 
     @property
     def dtype(self):
