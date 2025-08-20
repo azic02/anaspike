@@ -7,7 +7,12 @@ from numpy.typing import NDArray
 
 
 
-SupportedBaseTypes = Union[int, NDArray[np.float64], NDArray[np.object_]]
+SupportedBaseTypes = Union[int, NDArray[np.float64], NDArray[np.object_],
+                           'HDF5Mixin']
+
+
+__REGISTRY: Dict[str, Type['HDF5Mixin']] = {}
+
 
 def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
     if '__class__' not in hdf5_obj.attrs:
@@ -19,6 +24,9 @@ def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
         return int(hdf5_obj[()]) #type: ignore
     elif class_name == 'numpy.ndarray':
         return np.array(hdf5_obj[:]) #type: ignore
+    elif class_name in __REGISTRY:
+        cls = __REGISTRY[class_name]
+        return cls.from_hdf5(cast(h5py.Group, hdf5_obj))
     else:
         raise ValueError(f"Unsupported class type '{class_name}' found in HDF5 object.")
 
@@ -34,6 +42,10 @@ def _save_supported_base_type(hdf5_obj: h5py.Group, name: str, value: SupportedB
         else:
             raise ValueError(f"Unsupported numpy array dtype '{value.dtype}' for saving to HDF5.")
         ds.attrs.create('__class__', 'numpy.ndarray') #type: ignore
+    elif isinstance(value, HDF5Mixin):
+        group = value.to_hdf5(hdf5_obj, name)
+        group.attrs.create('__class__', value.__class__.__name__) #type: ignore
+        __REGISTRY[value.__class__.__name__] = value.__class__
     else:
         raise ValueError(f"Unsupported variable '{name}' of type '{type(value)}' for saving to HDF5.")
 
@@ -59,7 +71,7 @@ class HDF5Mixin:
                 raise KeyError(f"Missing required key '{k}' in HDF5 object.")
         return cls(**kwargs)
 
-    def to_hdf5(self, hdf5_obj: Union[h5py.File, h5py.Group], name: str) -> None:
+    def to_hdf5(self, hdf5_obj: Union[h5py.File, h5py.Group], name: str) -> h5py.Group:
         group = hdf5_obj.create_group(name) # type: ignore
         for k in self.init_args:
             k_mod = k
@@ -69,4 +81,5 @@ class HDF5Mixin:
                 raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{k}'")
             v = getattr(self, k_mod)
             _save_supported_base_type(group, k, v)
+        return group
 

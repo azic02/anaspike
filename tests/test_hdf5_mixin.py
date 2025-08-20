@@ -117,3 +117,43 @@ class TestHDF5Mixin(unittest.TestCase):
             with self.assertRaises(ValueError):
                 instance.to_hdf5(f, 'dummy')
 
+    def test_two_simultaneous_classes(self):
+        class ClassA(HDF5Mixin):
+            def __init__(self, valueA: int):
+                self.valueA = valueA
+        class ClassB(HDF5Mixin):
+            def __init__(self, valueB: int):
+                self.valueB = valueB
+
+        instanceA = ClassA(valueA=10)
+        instanceB = ClassB(valueB=20)
+        with h5py.File('test.h5', 'w') as f:
+            instanceA.to_hdf5(f, 'classA')
+            instanceB.to_hdf5(f, 'classB')
+        with h5py.File('test.h5', 'r') as f:
+            loaded_instanceA = ClassA.from_hdf5(f['classA'])
+            loaded_instanceB = ClassB.from_hdf5(f['classB'])
+
+        self.assertEqual(instanceA.valueA, loaded_instanceA.valueA)
+        self.assertEqual(instanceB.valueB, loaded_instanceB.valueB)
+
+    def test_nested_hdf5mixin_member(self):
+        class InnerClass(HDF5Mixin):
+            def __init__(self, value: int):
+                self.value = value
+
+        class OuterClass(HDF5Mixin):
+            def __init__(self, inner: InnerClass):
+                self.inner = inner
+
+        inner_instance = InnerClass(value=42)
+        outer_instance = OuterClass(inner=inner_instance)
+
+        with h5py.File('test.h5', 'w') as f:
+            outer_instance.to_hdf5(f, 'outer')
+
+        with h5py.File('test.h5', 'r') as f:
+            loaded_outer = OuterClass.from_hdf5(f['outer'])
+
+        self.assertEqual(outer_instance.inner.value, loaded_outer.inner.value)
+
