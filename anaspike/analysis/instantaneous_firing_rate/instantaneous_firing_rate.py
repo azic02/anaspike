@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ..hdf5_mixin import HDF5Mixin
-from ..dataclasses.histogram import ContigBins
+from ...hdf5_mixin import HDF5Mixin
+from ...dataclasses.histogram import ContigBins
 
 
 

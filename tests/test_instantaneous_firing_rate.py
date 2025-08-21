@@ -4,7 +4,7 @@ import numpy as np
 
 from anaspike.dataclasses.interval import Interval
 from anaspike.dataclasses.histogram import EquiBins
-from anaspike.dataclasses.firing_rate_evolution import FiringRateEvolution
+from anaspike.analysis.instantaneous_firing_rate import FiringRateEvolution
 
 
 
