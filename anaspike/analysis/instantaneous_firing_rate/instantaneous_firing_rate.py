@@ -25,7 +25,7 @@ class InstantaneousFiringRates(HDF5Mixin):
         spike_counts = np.array([Histogram.construct_by_counting(bins=time_bins, data=st).counts for st in spike_trains])
         return cls(
             times=time_bins.values,
-            firing_rates=np.array(spike_counts).T / time_bins.bin_width * 1.e3
+            firing_rates=np.array(spike_counts) / time_bins.bin_width * 1.e3
         )
 
     @property
@@ -33,16 +33,16 @@ class InstantaneousFiringRates(HDF5Mixin):
         return self.__times
 
     @property
-    def firing_rates(self) -> NDArray[np.float64]:
-        return self.__firing_rates
+    def _firing_rates(self) -> NDArray[np.float64]:
+        return self.along_neuron_dim
 
     @property
     def along_time_dim(self):
-        return self.firing_rates
+        return self.__firing_rates.T
 
     @property
     def along_neuron_dim(self):
-        return self.firing_rates.T
+        return self.__firing_rates
 
     @property
     def n_times(self) -> int:
@@ -50,5 +50,5 @@ class InstantaneousFiringRates(HDF5Mixin):
 
     @property
     def n_neurons(self) -> int:
-        return self.firing_rates.shape[1]
+        return self.along_neuron_dim.shape[0]
 

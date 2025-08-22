@@ -35,7 +35,7 @@ class CommonSetup(unittest.TestCase):
             times=cls.times,
             firing_rates=np.array([[2.0, 0.0, 0.0],
                                    [0.0, 1.0, 2.0],
-                                   [0.1, 0.0, 0.0]]).T
+                                   [0.1, 0.0, 0.0]])
             )
 
         cls.x_bins = [Bin(start=float(i), end=float(i + 1), value=float(i + 0.5)) for i in range(2)]

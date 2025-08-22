@@ -14,7 +14,7 @@ class TestInstantaneousFiringRatesInit(unittest.TestCase):
                                  [7.0, 8.0, 9.0]])
         ifr = InstantaneousFiringRates(times=times, firing_rates=firing_rates)
         self.assertTrue(np.array_equal(ifr.times, times))
-        self.assertTrue(np.array_equal(ifr.firing_rates, firing_rates))
+        self.assertTrue(np.array_equal(ifr.along_neuron_dim, firing_rates))
 
     def test_invalid_times_shape(self):
         with self.assertRaises(ValueError):
@@ -91,20 +91,20 @@ class TestInstantaneousFiringRatesProperties(unittest.TestCase):
             self.instantaneous_firing_rates.to_hdf5(f, 'instantaneous_firing_rates')
         with h5py.File('test_instantaneous_firing_rates.h5', 'r') as f:
             loaded = InstantaneousFiringRates.from_hdf5(f['instantaneous_firing_rates'])
-        np.testing.assert_array_equal(loaded.firing_rates, self.instantaneous_firing_rates.firing_rates)
+        np.testing.assert_array_equal(loaded.along_neuron_dim, self.instantaneous_firing_rates.along_neuron_dim)
         np.testing.assert_array_equal(loaded.times, self.instantaneous_firing_rates.times)
 
     def test_along_time_dim(self):
         for actual, expected in zip(
             self.instantaneous_firing_rates.along_time_dim,
-            self.firing_rates
+            self.firing_rates.T
         ):
             np.testing.assert_array_equal(actual, expected)
 
     def test_along_neuron_dim(self):
         for actual, expected in zip(
             self.instantaneous_firing_rates.along_neuron_dim,
-            self.firing_rates.T
+            self.firing_rates
         ):
             np.testing.assert_array_equal(actual, expected)
 
