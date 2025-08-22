@@ -10,8 +10,7 @@ class TestInstantaneousFiringRatesInit(unittest.TestCase):
     def test_valid_input(self):
         times = np.array([0.0, 1.0, 2.0])
         firing_rates = np.array([[1.0, 2.0, 3.0],
-                                 [4.0, 5.0, 6.0],
-                                 [7.0, 8.0, 9.0]])
+                                 [4.0, 5.0, 6.0]])
         ifr = InstantaneousFiringRates(times=times, firing_rates=firing_rates)
         self.assertTrue(np.array_equal(ifr.times, times))
         self.assertTrue(np.array_equal(ifr.along_neuron_dim, firing_rates))
@@ -27,7 +26,8 @@ class TestInstantaneousFiringRatesInit(unittest.TestCase):
     def test_mismatched_dimensions(self):
         with self.assertRaises(ValueError):
             InstantaneousFiringRates(times=np.array([0.0, 1.0]),
-                                     firing_rates=np.array([[1.0, 2.0]]))
+                                     firing_rates=np.array([[1.0],
+                                                            [2.0]]))
 
 
 class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):

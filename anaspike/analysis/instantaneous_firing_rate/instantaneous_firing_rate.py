@@ -13,8 +13,8 @@ class InstantaneousFiringRates(HDF5Mixin):
             raise ValueError("`times` must be a 1D array.")
         if firing_rates.ndim != 2:
             raise ValueError("`firing_rates` must be a 2D array.")
-        if times.shape[0] != firing_rates.shape[0]:
-            raise ValueError("First dimensions of `firing_rates` and `times` must match.")
+        if times.shape[0] != firing_rates.shape[1]:
+            raise ValueError("First dimension of `times` and second dimension of `firing_rates` must match.")
 
         self.__times = times
         self.__firing_rates = firing_rates
