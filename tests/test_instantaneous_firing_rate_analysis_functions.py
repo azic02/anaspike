@@ -75,6 +75,21 @@ class TestTemporalCorrelationMatrix(CommonSetup):
         np.testing.assert_array_almost_equal(new_result, deprecated_result)
 
 
+class TestMoransIEvolution(CommonSetup):
+    def test_deprecated_vs_new_implementation(self):
+        from anaspike.analysis.deprecated_functions import morans_i_evolution as deprecated_morans_i
+        from anaspike.analysis.instantaneous_firing_rate import morans_i_evolution
+        from anaspike.dataclasses.coords2d import Coords2D
+        coords = Coords2D(self.population_data.x_pos, self.population_data.y_pos)
+        decay_power = 1.0
+        deprecated_result = deprecated_morans_i(self.population_data, 
+                                                self.spike_recorder_data,
+                                                self.t_bins,
+                                                decay_power)
+        new_result = morans_i_evolution(self.instantaneous_firing_rates, coords, decay_power)
+        np.testing.assert_array_almost_equal(new_result, deprecated_result)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 

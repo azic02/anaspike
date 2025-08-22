@@ -4,6 +4,9 @@ import numpy as np
 from numpy.typing import NDArray
 
 from .instantaneous_firing_rate import InstantaneousFiringRates
+from anaspike.dataclasses.coords2d import Coords2D
+from anaspike.functions._helpers import calculate_pairwise_2d_euclidean_distances
+from anaspike.functions.statistical_quantities import morans_i
 
 
 
@@ -18,4 +21,14 @@ def temporal_correlation(firing_rates: InstantaneousFiringRates,
 
 def temporal_correlation_matrix(firing_rates: InstantaneousFiringRates) -> NDArray[np.float64]:
     return np.corrcoef(firing_rates.along_neuron_dim).astype(np.float64)
+
+
+def morans_i_evolution(firing_rates: InstantaneousFiringRates, coords: Coords2D, decay_power: float=1.) -> NDArray[np.float64]:
+    if firing_rates.n_neurons != len(coords):
+        raise ValueError("Number of neurons in `firing_rates` and length of `coords` must match.")
+    distances = calculate_pairwise_2d_euclidean_distances(coords.x, coords.y)
+    np.fill_diagonal(distances, 1.)
+    weights = np.power(distances, -decay_power)
+    np.fill_diagonal(weights, 0.)
+    return np.array([morans_i(fr, weights) for fr in firing_rates.along_time_dim])
 
