@@ -14,3 +14,8 @@ def temporal_correlation(firing_rates: InstantaneousFiringRates,
     if ref_firing_rate.shape[0] != firing_rates.n_times:
         raise ValueError("Reference and comparison firing rates must have the same number of time points.")
     return np.array([cast(float, np.corrcoef(ref_firing_rate, fr)[0, 1]) for fr in firing_rates.along_neuron_dim])
+
+
+def temporal_correlation_matrix(firing_rates: InstantaneousFiringRates) -> NDArray[np.float64]:
+    return np.corrcoef(firing_rates.along_neuron_dim).astype(np.float64)
+

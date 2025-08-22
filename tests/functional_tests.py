@@ -52,11 +52,14 @@ time_vals = [t_bin.value for t_bin in t_bins]
 
 # ## analysis
 
-# +
-from anaspike.analysis.instantaneous_firing_rate import InstantaneousFiringRates, temporal_correlation
-from anaspike.visualization import plot_firing_rate_temporal_correlation
+# ### instantaneous firing rate
 
+from anaspike.analysis.instantaneous_firing_rate import InstantaneousFiringRates
 instantaneous_firing_rates = InstantaneousFiringRates.from_nest(pop, spike_recorder, t_bins)
+
+# +
+from anaspike.analysis.instantaneous_firing_rate import temporal_correlation
+from anaspike.visualization import plot_firing_rate_temporal_correlation
 
 e = 0.02
 center_mask = (-e < pop.x_pos) & (pop.x_pos < e) & (-e < pop.y_pos) & (pop.y_pos < e)
@@ -71,6 +74,15 @@ plot_firing_rate_temporal_correlation(fig, ax,
                                       pop.x_pos, pop.y_pos,
                                       t_corr,
                                       cmap='bwr')
+# +
+from anaspike.analysis.instantaneous_firing_rate import temporal_correlation_matrix
+from anaspike.visualization import plot_pairwise_temporal_correlation_matrix
+
+t_corr_mat = temporal_correlation_matrix(instantaneous_firing_rates)
+
+fig, ax = plt.subplots()
+plot_pairwise_temporal_correlation_matrix(fig, ax, t_corr_mat)
 # -
+
 
 

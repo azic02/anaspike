@@ -65,6 +65,16 @@ class TestTemporalCorrelation(CommonSetup):
             temporal_correlation(self.instantaneous_firing_rates, ref_firing_rate)
 
 
+class TestTemporalCorrelationMatrix(CommonSetup):
+    def test_deprecated_vs_new_implementation(self):
+        from anaspike.analysis.instantaneous_firing_rate import temporal_correlation_matrix
+        from anaspike.analysis.deprecated_functions import pairwise_temporal_correlation_matrix as deprecated_pairwise
+
+        deprecated_result = deprecated_pairwise(self.population_data, self.spike_recorder_data, self.t_bins)
+        new_result = temporal_correlation_matrix(self.instantaneous_firing_rates)
+        np.testing.assert_array_almost_equal(new_result, deprecated_result)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
 
