@@ -6,7 +6,76 @@ from anaspike.analysis.instantaneous_firing_rate import InstantaneousFiringRates
 
 
 
-class TestInstantaneousFiringRates(unittest.TestCase):
+class TestInstantaneousFiringRatesInit(unittest.TestCase):
+    def test_valid_input(self):
+        times = np.array([0.0, 1.0, 2.0])
+        firing_rates = np.array([[1.0, 2.0, 3.0],
+                                 [4.0, 5.0, 6.0],
+                                 [7.0, 8.0, 9.0]])
+        ifr = InstantaneousFiringRates(times=times, firing_rates=firing_rates)
+        self.assertTrue(np.array_equal(ifr.times, times))
+        self.assertTrue(np.array_equal(ifr.firing_rates, firing_rates))
+
+    def test_invalid_times_shape(self):
+        with self.assertRaises(ValueError):
+            InstantaneousFiringRates(times=np.array([[0.0], [1.0]]), firing_rates=np.array([[1.0]]))
+
+    def test_invalid_firing_rates_shape(self):
+        with self.assertRaises(ValueError):
+            InstantaneousFiringRates(times=np.array([0.0]), firing_rates=np.array([1.0]))
+
+    def test_mismatched_dimensions(self):
+        with self.assertRaises(ValueError):
+            InstantaneousFiringRates(times=np.array([0.0, 1.0]),
+                                     firing_rates=np.array([[1.0, 2.0]]))
+
+
+class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
+    def setUp(self):
+        from anaspike.dataclasses.nest_devices import PopulationData, SpikeRecorderData
+        from anaspike.dataclasses.histogram import EquiBins
+        from anaspike.dataclasses.interval import Interval
+
+        self.population_data = PopulationData(
+            ids=np.array([0, 1, 2]),
+            x_pos=np.array([0.1, 2.0, 0.25]),
+            y_pos=np.array([0.5, 2.5, 0.75])
+        )
+
+        self.spike_recorder_data = SpikeRecorderData(
+                senders=np.array([0, 0, 2, 1, 1, 1], dtype=np.int64),
+                times=np.array([0.1, 0.5, 0.75, 1.1, 2.1, 2.5], dtype=np.float64)
+                )
+
+        self.time_bins = EquiBins.from_interval_with_median_values(Interval(0.0, 3.0), n=3)
+
+    def test_from_nest(self):
+        expected_times = self.time_bins.values
+        expected_firing_rates=np.array([[2000., 0000., 0000.],
+                                        [0000., 1000., 2000.],
+                                        [1000., 0000., 0000.]]).T
+
+        ifr = InstantaneousFiringRates.from_nest(
+            pop=self.population_data,
+            sr=self.spike_recorder_data,
+            time_bins=self.time_bins
+        )
+        np.testing.assert_array_equal(ifr.times, expected_times)
+        np.testing.assert_array_equal(ifr.along_time_dim, expected_firing_rates)
+
+    def test_from_nest_v_deprecated_function(self):
+        from anaspike.analysis import firing_rates_evolution as deprecated_firing_rates
+
+        depr_fr = deprecated_firing_rates(self.population_data, self.spike_recorder_data, self.time_bins)
+        ifr = InstantaneousFiringRates.from_nest(
+            pop=self.population_data,
+            sr=self.spike_recorder_data,
+            time_bins=self.time_bins
+        )
+        np.testing.assert_array_equal(ifr.along_time_dim, depr_fr)
+
+
+class TestInstantaneousFiringRatesProperties(unittest.TestCase):
     def setUp(self):
         self.firing_rates = np.array([[1.0, 2.0, 3.0],
                                       [4.0, 5.0, 6.0],

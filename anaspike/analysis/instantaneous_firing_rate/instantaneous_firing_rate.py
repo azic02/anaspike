@@ -2,6 +2,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ...hdf5_mixin import HDF5Mixin
+from ...dataclasses.nest_devices import PopulationData, SpikeRecorderData
+from ...dataclasses.histogram import EquiBins, Histogram
 
 
 
@@ -16,6 +18,15 @@ class InstantaneousFiringRates(HDF5Mixin):
 
         self.__times = times
         self.__firing_rates = firing_rates
+
+    @classmethod
+    def from_nest(cls, pop: PopulationData, sr: SpikeRecorderData, time_bins: EquiBins) -> "InstantaneousFiringRates":
+        spike_trains = sr.get_spike_trains(pop.ids)
+        spike_counts = np.array([Histogram.construct_by_counting(bins=time_bins, data=st).counts for st in spike_trains])
+        return cls(
+            times=time_bins.values,
+            firing_rates=np.array(spike_counts).T / time_bins.bin_width * 1.e3
+        )
 
     @property
     def times(self) -> NDArray[np.float64]:
