@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Union
 
 import numpy as np
@@ -10,11 +9,16 @@ from ..coords2d import Coords2D
 
 
 
-@dataclass
 class PopulationData:
-    ids: NDArray[np.int64]
-    x_pos: NDArray[np.float64]
-    y_pos: NDArray[np.float64]
+    def __init__(self, ids: NDArray[np.int64], x_pos: NDArray[np.float64], y_pos: NDArray[np.float64]):
+        validate_one_dimensional(ids)
+        validate_one_dimensional(x_pos)
+        validate_one_dimensional(y_pos)
+        validate_same_length([ids, x_pos, y_pos])
+
+        self.__ids = ids
+        self.__coords = Coords2D(x_pos, y_pos)
+
 
     @classmethod
     def from_hdf5(cls, entity: Union[h5py.Group, h5py.File]) -> 'PopulationData':
@@ -27,12 +31,6 @@ class PopulationData:
         entity.create_dataset('ids', data=self.ids)
         entity.create_dataset('x_pos', data=self.x_pos)
         entity.create_dataset('y_pos', data=self.y_pos)
-
-    def __post_init__(self):
-        validate_one_dimensional(self.ids)
-        validate_one_dimensional(self.x_pos)
-        validate_one_dimensional(self.y_pos)
-        validate_same_length([self.ids, self.x_pos, self.y_pos])
 
     def __len__(self):
         return len(self.ids)
@@ -53,14 +51,25 @@ class PopulationData:
                 )
 
     @property
+    def ids(self) -> NDArray[np.int64]:
+        return self.__ids
+
+    @property
+    def x_pos(self) -> NDArray[np.float64]:
+        return self.coords.x
+
+    @property
+    def y_pos(self) -> NDArray[np.float64]:
+        return self.coords.y
+
+    @property
     def coords(self) -> Coords2D:
-        return Coords2D(self.x_pos, self.y_pos)
+        return self.__coords
 
 
-@dataclass
 class NeuronData(PopulationData):
-    def __post_init__(self):
-        super().__post_init__()
+    def __init__(self, ids: NDArray[np.int64], x_pos: NDArray[np.float64], y_pos: NDArray[np.float64]):
+        super().__init__(ids, x_pos, y_pos)
         if len(self) != 1:
             raise ValueError("NeuronData must contain exactly one neuron.")
 
