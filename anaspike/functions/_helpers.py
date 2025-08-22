@@ -22,7 +22,7 @@ def slice_from_vec(v: Iterable[int]) -> Tuple[slice, ...]:
     return tuple(slice(x, None) if x >= 0 else slice(None, x) for x in v)
 
 
-def offset_via_slicing(static_data: NDArray, to_offset_data: NDArray, offset_vector: NDArray[np.int64]) -> Tuple[NDArray, NDArray]:
+def offset_via_slicing(static_data: NDArray[np.float64], to_offset_data: NDArray[np.float64], offset_vector: NDArray[np.int64]) -> Tuple[NDArray[np.float64], NDArray[np.float64]]:
     if static_data.shape != to_offset_data.shape:
         raise ValueError("The two datasets must have the same shape.")
     if offset_vector.shape[0] != static_data.ndim:
@@ -46,7 +46,7 @@ def validate_one_dimensional(arr: NDArray[Any]):
         raise ValueError("Array not one dimensional.")
 
 
-def calculate_pairwise_2d_euclidean_distances(xs: NDArray, ys: NDArray) -> NDArray[np.float64]:
+def calculate_pairwise_2d_euclidean_distances(xs: NDArray[np.float64], ys:NDArray[np.float64]) -> NDArray[np.float64]:
     validate_one_dimensional(xs)
     if xs.shape != ys.shape:
         raise ValueError("The two arrays must have the same shape.")
