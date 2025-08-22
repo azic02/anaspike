@@ -85,10 +85,8 @@ plot_pairwise_temporal_correlation_matrix(fig, ax, t_corr_mat)
 # +
 from anaspike.analysis.instantaneous_firing_rate import morans_i_evolution
 from anaspike.visualization import plot_morans_i_evolution
-from anaspike.dataclasses.coords2d import Coords2D
 
-coords = Coords2D(pop.x_pos, pop.y_pos)
-morans_i = morans_i_evolution(instantaneous_firing_rates, coords, decay_power=4)
+morans_i = morans_i_evolution(instantaneous_firing_rates, pop.coords, decay_power=4)
 
 fig, ax = plt.subplots()
 plot_morans_i_evolution(ax, time_vals, morans_i)

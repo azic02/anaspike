@@ -6,6 +6,7 @@ from numpy.typing import NDArray
 import h5py
 
 from ...functions._helpers import validate_one_dimensional, validate_same_length
+from ..coords2d import Coords2D
 
 
 
@@ -50,6 +51,10 @@ class PopulationData:
                 if type(key) == int
                 else PopulationData(self.ids[key], self.x_pos[key], self.y_pos[key])
                 )
+
+    @property
+    def coords(self) -> Coords2D:
+        return Coords2D(self.x_pos, self.y_pos)
 
 
 @dataclass
