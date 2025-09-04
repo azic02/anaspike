@@ -1,4 +1,5 @@
 import unittest
+from typing import List, Tuple
 
 import h5py
 
@@ -191,4 +192,54 @@ class TestHDF5Mixin(unittest.TestCase):
             loaded_outer = OuterClass.from_hdf5(f['outer'])
 
         self.assertEqual(outer_instance.inner.value, loaded_outer.inner.value)
+
+    def test_list_of_ints_member(self):
+        class DummyClass(HDF5Mixin):
+            def __init__(self, values: List[int]):
+                self.values = values
+
+        instance = DummyClass(values=[1, 2, 3])
+        with h5py.File('test.h5', 'w') as f_out:
+            instance.to_hdf5(f_out, 'dummy')
+
+        with h5py.File('test.h5', 'r') as f_in:
+            loaded_instance = DummyClass.from_hdf5(f_in['dummy'])
+
+        self.assertEqual(instance.values, loaded_instance.values)
+
+    def test_tuple_of_nums_member(self):
+        class DummyClass(HDF5Mixin):
+            def __init__(self, values: Tuple[int, float, int]):
+                self.values = values
+
+        instance = DummyClass(values=(1, 2.0, 3))
+        with h5py.File('test.h5', 'w') as f_out:
+            instance.to_hdf5(f_out, 'dummy')
+
+        with h5py.File('test.h5', 'r') as f_in:
+            loaded_instance = DummyClass.from_hdf5(f_in['dummy'])
+
+        self.assertEqual(instance.values, loaded_instance.values)
+
+    def test_list_of_hdf5mixins_member(self):
+        class ItemClass(HDF5Mixin):
+            def __init__(self, value: int):
+                self.value = value
+
+        class ContainerClass(HDF5Mixin):
+            def __init__(self, items: List[ItemClass]):
+                self.items = items
+
+        items = [ItemClass(value=i) for i in range(3)]
+        instance = ContainerClass(items=items)
+
+        with h5py.File('test.h5', 'w') as f_out:
+            instance.to_hdf5(f_out, 'container')
+
+        with h5py.File('test.h5', 'r') as f_in:
+            loaded_instance = ContainerClass.from_hdf5(f_in['container'])
+
+        self.assertEqual(len(instance.items), len(loaded_instance.items))
+        for original, loaded in zip(instance.items, loaded_instance.items):
+            self.assertEqual(original.value, loaded.value)
 

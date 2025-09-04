@@ -1,4 +1,4 @@
-from typing import Type, TypeVar, Union, cast, Dict, List
+from typing import Type, TypeVar, Union, cast, Dict, List, Tuple
 import inspect
 
 import h5py
@@ -9,6 +9,9 @@ from numpy.typing import NDArray
 
 SupportedBaseTypes = Union[float, int, NDArray[np.int64], NDArray[np.float64], NDArray[np.object_],
                            'HDF5Mixin']
+SupportedContainerTypes = Union[List[SupportedBaseTypes], Tuple[SupportedBaseTypes, ...]]
+
+AllSupportedTypes = Union[SupportedBaseTypes, SupportedContainerTypes]
 
 
 __REGISTRY: Dict[str, Type['HDF5Mixin']] = {}
@@ -32,12 +35,39 @@ def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
     else:
         raise ValueError(f"Unsupported class type '{class_name}' found in HDF5 object.")
 
-def _save_supported_base_type(hdf5_obj: h5py.Group, name: str, value: SupportedBaseTypes) -> None:
+def _load_supported_container_type(hdf5_obj: h5py.Group) -> SupportedContainerTypes:
+    if '__class__' not in hdf5_obj.attrs:
+        raise ValueError("HDF5 object does not contain '__class__' attribute.")
+    
+    idxs: List[int] = sorted(hdf5_obj.keys(), key=lambda x: int(x)) #type: ignore
+    class_name = hdf5_obj.attrs['__class__'] #type: ignore
+    if class_name == 'list':
+        return [_load_supported_base_type(cast(h5py.Dataset, hdf5_obj[idx])) for idx in idxs]
+    elif class_name == 'tuple':
+        return tuple(_load_supported_base_type(cast(h5py.Dataset, hdf5_obj[idx])) for idx in idxs)
+    else:
+        raise ValueError(f"Unsupported container type '{class_name}' found in HDF5 object.")
+
+def _load_supported_type(hdf5_obj: Union[h5py.Group, h5py.Dataset]) -> AllSupportedTypes:
+    if '__metaclass__' not in hdf5_obj.attrs:
+        raise ValueError("HDF5 object does not contain '__metaclass__' attribute.")
+
+    metaclass = hdf5_obj.attrs['__metaclass__'] #type: ignore
+    if metaclass == 'base':
+        return _load_supported_base_type(cast(h5py.Dataset, hdf5_obj))
+    elif metaclass == 'container':
+        return _load_supported_container_type(cast(h5py.Group, hdf5_obj))
+    else:
+        raise ValueError(f"Unsupported metaclass '{metaclass}' found in HDF5 object.")
+
+def _save_supported_type(hdf5_obj: h5py.Group, name: str, value: AllSupportedTypes) -> None:
     if isinstance(value, int):
         ds = hdf5_obj.create_dataset(name, data=value) #type: ignore
+        ds.attrs.create('__metaclass__', 'base') #type: ignore
         ds.attrs.create('__class__', 'int') #type: ignore
     elif isinstance(value, float):
         ds = hdf5_obj.create_dataset(name, data=value) #type: ignore
+        ds.attrs.create('__metaclass__', 'base') #type: ignore
         ds.attrs.create('__class__', 'float') #type: ignore
     elif isinstance(value, np.ndarray):
         if value.dtype == np.float64:
@@ -48,11 +78,25 @@ def _save_supported_base_type(hdf5_obj: h5py.Group, name: str, value: SupportedB
             ds = hdf5_obj.create_dataset(name, data=value, dtype=h5py.vlen_dtype(np.float64)) #type: ignore
         else:
             raise ValueError(f"Unsupported numpy array dtype '{value.dtype}' for saving to HDF5.")
+        ds.attrs.create('__metaclass__', 'base') #type: ignore
         ds.attrs.create('__class__', 'numpy.ndarray') #type: ignore
-    elif isinstance(value, HDF5Mixin): #type: ignore
+    elif isinstance(value, HDF5Mixin):
         group = value.to_hdf5(hdf5_obj, name)
+        group.attrs.create('__metaclass__', 'base') #type: ignore
         group.attrs.create('__class__', value.__class__.__name__) #type: ignore
         __REGISTRY[value.__class__.__name__] = value.__class__
+    elif isinstance(value, list):
+        sub_group = hdf5_obj.create_group(name) #type: ignore
+        sub_group.attrs.create('__metaclass__', 'container') #type: ignore
+        sub_group.attrs.create('__class__', 'list') #type: ignore
+        for i, item in enumerate(value):
+            _save_supported_type(sub_group, str(i), item)
+    elif isinstance(value, tuple):
+        sub_group = hdf5_obj.create_group(name) #type: ignore
+        sub_group.attrs.create('__metaclass__', 'container') #type: ignore
+        sub_group.attrs.create('__class__', 'tuple') #type: ignore
+        for i, item in enumerate(value):
+            _save_supported_type(sub_group, str(i), item)
     else:
         raise ValueError(f"Unsupported variable '{name}' of type '{type(value)}' for saving to HDF5.")
 
@@ -69,11 +113,11 @@ class HDF5Mixin:
     def from_hdf5(cls: Type[T], hdf5_obj: Union[h5py.File, h5py.Group, h5py.Dataset, h5py.Datatype]) -> T:
         if not isinstance(hdf5_obj, (h5py.Group, h5py.File)):
             raise TypeError("Expected hdf5_obj to be a Group or File.")
-        kwargs: Dict[str, SupportedBaseTypes] = {}
+        kwargs: Dict[str, AllSupportedTypes] = {}
         for k in cls.init_args:
             if k in hdf5_obj:
                 v = hdf5_obj[k]
-                kwargs[k] = _load_supported_base_type(cast(h5py.Dataset, v))
+                kwargs[k] = _load_supported_type(cast(h5py.Dataset, v))
             else:
                 raise KeyError(f"Missing required key '{k}' in HDF5 object.")
         return cls(**kwargs)
@@ -87,6 +131,6 @@ class HDF5Mixin:
             if not hasattr(self, k_mod):
                 raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{k}'")
             v = getattr(self, k_mod)
-            _save_supported_base_type(group, k, v)
+            _save_supported_type(group, k, v)
         return group
 
