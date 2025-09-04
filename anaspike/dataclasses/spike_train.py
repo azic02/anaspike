@@ -12,6 +12,10 @@ class SpikeTrainArray(HDF5Mixin):
     def __init__(self, spike_trains: Collection[SpikeTrain]):
         self._spike_trains = np.asarray(spike_trains, dtype=object)
 
+    @property
+    def n_neurons(self) -> int:
+        return self._spike_trains.shape[0]
+
     def __array__(self, dtype: Union[DTypeLike, None] = None):
         return np.asarray(self._spike_trains, dtype=dtype)
 
@@ -21,7 +25,7 @@ class SpikeTrainArray(HDF5Mixin):
         return SpikeTrainArray(self._spike_trains[index])
 
     def __len__(self):
-        return len(self._spike_trains)
+        return self.n_neurons
 
     def __iter__(self):
         for train in self._spike_trains:
