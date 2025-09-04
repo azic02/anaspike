@@ -11,7 +11,7 @@ setup(
         'anaspike': ['anaspike/py.py.typed']
         },
     install_requires=requirements,
-    description='An analysis package for modular spiking network models',
+    description='An analysis package for spiking network models',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/azic02/anaspike',
