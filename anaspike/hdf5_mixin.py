@@ -23,7 +23,7 @@ def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
     if class_name == 'int':
         return int(hdf5_obj[()]) #type: ignore
     elif class_name == 'float':
-        return float(hdf5_obj[()])
+        return float(hdf5_obj[()]) #type: ignore
     elif class_name == 'numpy.ndarray':
         return np.array(hdf5_obj[:]) #type: ignore
     elif class_name in __REGISTRY:
@@ -37,7 +37,7 @@ def _save_supported_base_type(hdf5_obj: h5py.Group, name: str, value: SupportedB
         ds = hdf5_obj.create_dataset(name, data=value) #type: ignore
         ds.attrs.create('__class__', 'int') #type: ignore
     elif isinstance(value, float):
-        ds = hdf5_obj.create_dataset(name, data=value)
+        ds = hdf5_obj.create_dataset(name, data=value) #type: ignore
         ds.attrs.create('__class__', 'float') #type: ignore
     elif isinstance(value, np.ndarray):
         if value.dtype == np.float64:
@@ -49,7 +49,7 @@ def _save_supported_base_type(hdf5_obj: h5py.Group, name: str, value: SupportedB
         else:
             raise ValueError(f"Unsupported numpy array dtype '{value.dtype}' for saving to HDF5.")
         ds.attrs.create('__class__', 'numpy.ndarray') #type: ignore
-    elif isinstance(value, HDF5Mixin):
+    elif isinstance(value, HDF5Mixin): #type: ignore
         group = value.to_hdf5(hdf5_obj, name)
         group.attrs.create('__class__', value.__class__.__name__) #type: ignore
         __REGISTRY[value.__class__.__name__] = value.__class__
