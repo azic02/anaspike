@@ -5,7 +5,7 @@ with open('requirements.txt') as f:
 
 setup(
     name='anaspike',
-    version='0.5.0',
+    version='0.6.0',
     packages=find_packages(),
     package_data={
         'anaspike': ['anaspike/py.py.typed']
