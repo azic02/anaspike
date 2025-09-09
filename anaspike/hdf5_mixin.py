@@ -14,7 +14,7 @@ SupportedContainerTypes = Union[List[SupportedBaseTypes], Tuple[SupportedBaseTyp
 AllSupportedTypes = Union[SupportedBaseTypes, SupportedContainerTypes]
 
 
-__REGISTRY: Dict[str, Type['HDF5Mixin']] = {}
+_REGISTRY: Dict[str, Type['HDF5Mixin']] = {}
 
 
 def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
@@ -29,8 +29,8 @@ def _load_supported_base_type(hdf5_obj: h5py.Dataset) -> SupportedBaseTypes:
         return float(hdf5_obj[()]) #type: ignore
     elif class_name == 'numpy.ndarray':
         return np.array(hdf5_obj[:]) #type: ignore
-    elif class_name in __REGISTRY:
-        cls = __REGISTRY[class_name]
+    elif class_name in _REGISTRY:
+        cls = _REGISTRY[class_name]
         return cls.from_hdf5(cast(h5py.Group, hdf5_obj))
     else:
         raise ValueError(f"Unsupported class type '{class_name}' found in HDF5 object.")
@@ -84,7 +84,6 @@ def _save_supported_type(hdf5_obj: h5py.Group, name: str, value: AllSupportedTyp
         group = value.to_hdf5(hdf5_obj, name)
         group.attrs.create('__metaclass__', 'base') #type: ignore
         group.attrs.create('__class__', value.__class__.__name__) #type: ignore
-        __REGISTRY[value.__class__.__name__] = value.__class__
     elif isinstance(value, list):
         sub_group = hdf5_obj.create_group(name) #type: ignore
         sub_group.attrs.create('__metaclass__', 'container') #type: ignore
@@ -108,6 +107,7 @@ class HDF5Mixin:
     def __init_subclass__(cls):
         parameters = list(inspect.signature(cls.__init__).parameters.keys())
         cls.init_args = [p for p in parameters if not p.startswith('*') and p != 'self']
+        _REGISTRY[cls.__name__] = cls
 
     @classmethod
     def from_hdf5(cls: Type[T], hdf5_obj: Union[h5py.File, h5py.Group, h5py.Dataset, h5py.Datatype]) -> T:

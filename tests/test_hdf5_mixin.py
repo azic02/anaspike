@@ -243,3 +243,44 @@ class TestHDF5Mixin(unittest.TestCase):
         for original, loaded in zip(instance.items, loaded_instance.items):
             self.assertEqual(original.value, loaded.value)
 
+
+class TestLoadHDF5MixinDaughterWithoutSaving(unittest.TestCase):
+    def setUp(self) -> None:
+        class ParentClass(HDF5Mixin):
+            def __init__(self, int_value: int, float_value: float):
+                self.int_value = int_value
+                self.float_value = float_value
+        class DaughterClass(ParentClass):
+            def __init__(self, int_value: int, float_value: float, extra_value: float):
+                super().__init__(int_value, float_value)
+                self.extra_value = extra_value
+        class OuterClass(HDF5Mixin):
+            def __init__(self, daughter: DaughterClass):
+                self.daughter = daughter
+
+        self.filename = 'testmixindaughterclass.h5'
+        self.DaughterClass = DaughterClass
+        self.OuterClass = OuterClass
+
+    def test_save_and_load(self):
+        daughter = self.DaughterClass(int_value=10, float_value=3.14, extra_value=2.71)
+        outer = self.OuterClass(daughter=daughter)
+
+        with h5py.File(self.filename, 'w') as f:
+            outer.to_hdf5(f, 'outer')
+
+        with h5py.File(self.filename, 'r') as f:
+            loaded_outer = self.OuterClass.from_hdf5(f['outer'])
+
+        self.assertEqual(outer.daughter.int_value, loaded_outer.daughter.int_value)
+        self.assertEqual(outer.daughter.float_value, loaded_outer.daughter.float_value)
+        self.assertEqual(outer.daughter.extra_value, loaded_outer.daughter.extra_value)
+
+    def test_just_load(self):
+        with h5py.File(self.filename, 'r') as f:
+            loaded_outer = self.OuterClass.from_hdf5(f['outer'])
+
+        self.assertEqual(loaded_outer.daughter.int_value, 10)
+        self.assertEqual(loaded_outer.daughter.float_value, 3.14)
+        self.assertEqual(loaded_outer.daughter.extra_value, 2.71)
+

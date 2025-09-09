@@ -259,6 +259,33 @@ class TestEquiBins(unittest.TestCase):
         expected_width = 2.0
         self.assertAlmostEqual(self.bins.bin_width, expected_width)
 
+    def test_hdf5_conversion(self):
+        import h5py
+
+        with h5py.File('test_equibins.h5', 'w') as f_out:
+            self.bins.to_hdf5(f_out, 'equibins')
+
+        with h5py.File('test_equibins.h5', 'r') as f_in:
+            loaded_bins = EquiBins.from_hdf5(f_in['equibins'])
+
+        np.testing.assert_array_equal(loaded_bins.bin_edges, self.bins.bin_edges)
+        np.testing.assert_array_equal(loaded_bins.bin_values, self.bins.bin_values)
+
+    def test_hdf5_class_containing_equibins(self):
+        import h5py
+        from anaspike.hdf5_mixin import HDF5Mixin
+        class Container(HDF5Mixin):
+            def __init__(self, bins: ContigBins):
+                self.bins = bins
+
+        #c_out = Container(bins=self.bins)
+        #with h5py.File('test_container.h5', 'w') as f_out:
+        #    c_out.to_hdf5(f_out, 'container')
+        with h5py.File('test_container.h5', 'r') as f_in:
+            c_in = Container.from_hdf5(f_in['container'])
+        np.testing.assert_array_equal(c_in.bins.bin_edges, self.bins.bin_edges)
+        np.testing.assert_array_equal(c_in.bins.bin_values, self.bins.bin_values)
+
 
 class TestHistogramInit(unittest.TestCase):
     def test_non_matching_lengths(self):
