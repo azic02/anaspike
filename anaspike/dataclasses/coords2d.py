@@ -1,8 +1,11 @@
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
 
+from ..hdf5_mixin import HDF5Mixin
 
-class Coords2D:
+
+
+class Coords2D(HDF5Mixin):
     def __init__(self, x: ArrayLike, y: ArrayLike):
         x = np.asarray(x, dtype=np.float64)
         y = np.asarray(y, dtype=np.float64)
