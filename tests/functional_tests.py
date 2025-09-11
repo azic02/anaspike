@@ -42,7 +42,8 @@ t_sim = 10000.
 
 n_spatial_bins = 50
 
-t_bins = EquiBins.from_interval_with_median_values(Interval(100., t_sim), size=500.)
+t_interval = Interval(2000., t_sim)
+t_bins = EquiBins.from_interval_with_median_values(t_interval, size=500.)
 x_bins = EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins)
 y_bins = EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins)
 
@@ -51,6 +52,27 @@ time_vals = [t_bin.value for t_bin in t_bins]
 # -
 
 # ## analysis
+
+# ### spike trains
+
+from anaspike.dataclasses.spike_train import SpikeTrainArray
+spike_trains = spike_recorder.get_spike_trains(pop.ids)
+
+# ### time averaged firing rate
+
+from anaspike.analysis.time_averaged_firing_rate import TimeAveragedFiringRate
+time_averaged_firing_rates = TimeAveragedFiringRate.from_spike_trains(spike_trains, t_interval)
+
+from anaspike.analysis.time_averaged_firing_rate import mean as tafr_mean
+from anaspike.analysis.time_averaged_firing_rate import std as tafr_std
+print(tafr_mean(time_averaged_firing_rates), tafr_std(time_averaged_firing_rates))
+
+from anaspike.analysis.time_averaged_firing_rate import construct_histogram
+freq_bins = EquiBins.from_interval_with_median_values(Interval(0., 5.), n=20)
+tafr_histogram = construct_histogram(time_averaged_firing_rates, freq_bins)
+fig, ax = plt.subplots(figsize=(15,3))
+tafr_histogram.plot(ax)
+plt.show()
 
 # ### instantaneous firing rate
 
