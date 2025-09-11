@@ -82,28 +82,6 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
         np.testing.assert_array_equal(ifr.times, expected_times)
         np.testing.assert_array_equal(ifr.along_time_dim, expected_firing_rates)
 
-    def test_from_nest_v_deprecated_function(self):
-        from anaspike.dataclasses.nest_devices import PopulationData, SpikeRecorderData
-        population_data = PopulationData(
-            ids=np.array([0, 1, 2]),
-            x_pos=np.array([0.1, 2.0, 0.25]),
-            y_pos=np.array([0.5, 2.5, 0.75])
-        )
-
-        spike_recorder_data = SpikeRecorderData(
-                senders=np.array([0, 0, 2, 1, 1, 1], dtype=np.int64),
-                times=np.array([0.1, 0.5, 0.75, 1.1, 2.1, 2.5], dtype=np.float64)
-                )
-        from anaspike.analysis import firing_rates_evolution as deprecated_firing_rates
-
-        depr_fr = deprecated_firing_rates(population_data, spike_recorder_data, self.time_bins)
-        ifr = InstantaneousFiringRates.from_nest(
-            pop=population_data,
-            sr=spike_recorder_data,
-            time_bins=self.time_bins
-        )
-        np.testing.assert_array_equal(ifr.along_time_dim, depr_fr)
-
 
 class TestInstantaneousFiringRatesProperties(unittest.TestCase):
     def setUp(self):
