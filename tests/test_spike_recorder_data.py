@@ -29,25 +29,6 @@ class TestAdd(unittest.TestCase):
         np.testing.assert_array_almost_equal(spike_recorder_data_sum.times, expected_spike_recorder_data_sum.times)
 
 
-class TestGetSpikeTrains(unittest.TestCase):
-    def test_get_spike_trains(self):
-        spike_recorder_data = SpikeRecorderData(
-            senders=np.array([0, 1, 0, 1, 2], dtype=np.int64),
-            times=np.array([0.1, 0.2, 0.3, 0.4, 0.5], dtype=np.float64)
-        )
-
-        spike_trains = spike_recorder_data.get_spike_trains([0, 1, 2])
-
-        expected_spike_trains = [
-            np.array([0.1, 0.3], dtype=np.float64),
-            np.array([0.2, 0.4], dtype=np.float64),
-            np.array([0.5], dtype=np.float64)
-        ]
-
-        for res, exp in zip(spike_trains, expected_spike_trains):
-            np.testing.assert_array_almost_equal(res, exp)
-
-
 if __name__ == '__main__':
     unittest.main(verbosity=2)
 

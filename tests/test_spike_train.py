@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch, MagicMock
 
 import numpy as np
 
@@ -44,6 +45,30 @@ class TestSpikeTrainArray(unittest.TestCase):
             self.assertIsInstance(loaded, np.ndarray)
             self.assertEqual(loaded.dtype, np.float64)
             np.testing.assert_array_equal(original, loaded)
+
+
+class TestSpikeTrainArrayFromNest(unittest.TestCase):
+    @patch('anaspike.dataclasses.nest_devices.PopulationData')
+    @patch('anaspike.dataclasses.nest_devices.SpikeRecorderData')
+    def test_from_nest(self, MockSpikeRecorderData: MagicMock, MockPopulationData: MagicMock):
+        mock_pop = MockPopulationData()
+        mock_pop.ids = np.array([0, 1, 2], dtype=np.int64)
+
+        mock_sr = MockSpikeRecorderData()
+        mock_sr.times = np.array([0.1, 0.2, 0.3, 0.4, 0.5], dtype=np.float64)
+        mock_sr.senders = np.array([0, 1, 0, 1, 2], dtype=np.int64)
+
+        expected_spike_trains = [
+            np.array([0.1, 0.3], dtype=np.float64),
+            np.array([0.2, 0.4], dtype=np.float64),
+            np.array([0.5], dtype=np.float64)
+        ]
+
+        spike_trains = SpikeTrainArray.from_nest(mock_pop, mock_sr)
+
+        self.assertEqual(len(spike_trains), len(expected_spike_trains))
+        for sr, exp_sr in zip(spike_trains, expected_spike_trains):
+            np.testing.assert_array_almost_equal(exp_sr, sr)
 
 
 

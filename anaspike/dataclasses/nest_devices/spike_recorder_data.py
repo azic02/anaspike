@@ -7,7 +7,6 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ...functions._helpers import validate_same_length
-from .. import SpikeTrainArray
 
 
 
@@ -35,7 +34,4 @@ class SpikeRecorderData:
     def __add__(self, other: 'SpikeRecorderData') -> 'SpikeRecorderData':
         return SpikeRecorderData(senders=np.hstack([self.senders, other.senders]),
                                   times=np.hstack([self.times, other.times]))
-
-    def get_spike_trains(self, neuron_ids: Iterable[int]) -> SpikeTrainArray:
-        return SpikeTrainArray([np.sort(self.times[self.senders == i]) for i in neuron_ids])
 

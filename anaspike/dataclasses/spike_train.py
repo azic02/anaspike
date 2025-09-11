@@ -3,6 +3,7 @@ from numpy.typing import NDArray, DTypeLike
 from typing import Union, Collection
 
 from anaspike.hdf5_mixin import HDF5Mixin
+from anaspike.dataclasses.nest_devices import SpikeRecorderData, PopulationData
 
 
 
@@ -11,6 +12,10 @@ SpikeTrain = NDArray[np.float64]
 class SpikeTrainArray(HDF5Mixin):
     def __init__(self, spike_trains: Collection[SpikeTrain]):
         self._spike_trains = np.asarray(spike_trains, dtype=object)
+
+    @classmethod
+    def from_nest(cls, pop: PopulationData, sr: SpikeRecorderData) -> 'SpikeTrainArray':
+        return cls([np.sort(sr.times[sr.senders == i]) for i in pop.ids])
 
     @property
     def n_neurons(self) -> int:

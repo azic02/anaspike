@@ -56,7 +56,7 @@ time_vals = [t_bin.value for t_bin in t_bins]
 # ### spike trains
 
 from anaspike.dataclasses.spike_train import SpikeTrainArray
-spike_trains = spike_recorder.get_spike_trains(pop.ids)
+spike_trains = SpikeTrainArray.from_nest(pop, spike_recorder)
 
 # ### time averaged firing rate
 
@@ -77,7 +77,7 @@ plt.show()
 # ### instantaneous firing rate
 
 from anaspike.analysis.instantaneous_firing_rate import InstantaneousFiringRates
-instantaneous_firing_rates = InstantaneousFiringRates.from_nest(pop, spike_recorder, t_bins)
+instantaneous_firing_rates = InstantaneousFiringRates.from_spike_trains(spike_trains, t_bins)
 
 # +
 from anaspike.analysis.instantaneous_firing_rate import temporal_correlation

@@ -30,7 +30,7 @@ class InstantaneousFiringRates(HDF5Mixin):
 
     @classmethod
     def from_nest(cls, pop: PopulationData, sr: SpikeRecorderData, time_bins: EquiBins) -> "InstantaneousFiringRates":
-        spike_trains = sr.get_spike_trains(pop.ids)
+        spike_trains = SpikeTrainArray.from_nest(pop=pop, sr=sr)
         return cls.from_spike_trains(spike_trains=spike_trains, time_bins=time_bins)
 
     @property
