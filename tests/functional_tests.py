@@ -58,6 +58,22 @@ time_vals = [t_bin.value for t_bin in t_bins]
 from anaspike.dataclasses.spike_train import SpikeTrainArray
 spike_trains = SpikeTrainArray.from_nest(pop, spike_recorder)
 
+from anaspike.analysis.spike_trains import construct_spike_time_histogram
+spike_time_histogram = construct_spike_time_histogram(spike_trains, EquiBins.from_interval_with_median_values(t_interval, n=300))
+fig, ax = plt.subplots(figsize=(15,3))
+spike_time_histogram.plot(ax)
+plt.show()
+
+from anaspike.analysis.spike_trains import construct_interspike_interval_histogram
+interspike_interval_histogram = construct_interspike_interval_histogram(spike_trains, EquiBins.from_interval_with_median_values(Interval(0,400), n=100))
+fig, ax = plt.subplots(figsize=(15,3))
+interspike_interval_histogram.plot(ax)
+plt.show()
+
+from anaspike.analysis.spike_trains import calculate_active_neuron_fraction
+active_neuron_fraction = calculate_active_neuron_fraction(spike_trains, t_interval, thresh=1)
+print(active_neuron_fraction)
+
 # ### time averaged firing rate
 
 from anaspike.analysis.time_averaged_firing_rate import TimeAveragedFiringRate
