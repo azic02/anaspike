@@ -7,7 +7,7 @@ from .analysis_functions import (mean,
 __all__ = ["TimeAveragedFiringRate",
            "mean",
            "std",
-           "constructhistogram",
+           "construct_histogram",
           ]
 
 
