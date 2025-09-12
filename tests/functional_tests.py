@@ -78,8 +78,17 @@ print(active_neuron_fraction)
 
 # ### time averaged firing rate
 
+# +
 from anaspike.analysis.time_averaged_firing_rate import TimeAveragedFiringRate
 time_averaged_firing_rates = TimeAveragedFiringRate.from_spike_trains(spike_trains, t_interval)
+
+fig, ax = plt.subplots()
+scat = ax.scatter(x=pop.coords.x, y=pop.coords.y, c=time_averaged_firing_rates, vmin=0., cmap='Greys', s=10)
+ax.set_xlabel('cortical space [mm]')
+ax.set_ylabel('cortical space [mm]')
+fig.colorbar(scat, ax=ax, label='firing rate [Hz]')
+plt.show()
+# -
 
 from anaspike.analysis.time_averaged_firing_rate import mean as tafr_mean
 from anaspike.analysis.time_averaged_firing_rate import std as tafr_std
@@ -97,9 +106,12 @@ from anaspike.analysis.time_averaged_firing_rate import bin_spatially
 binned_tafr = bin_spatially(time_averaged_firing_rates, pop.coords, spatial_bins)
 
 fig, ax = plt.subplots()
-ax.pcolormesh(spatial_bins.x.values, spatial_bins.y.values, np.reshape(binned_tafr, (len(spatial_bins.x.values), len(spatial_bins.y.values))),
-             vmin=0., vmax=np.max(binned_tafr),
+pcmesh = ax.pcolormesh(spatial_bins.x.values, spatial_bins.y.values, np.transpose(np.reshape(binned_tafr, (len(spatial_bins.x.values), len(spatial_bins.y.values)))),
+             vmin=0.,
              cmap='Greys')
+ax.set_xlabel('cortical space [mm]')
+ax.set_ylabel('cortical space [mm]')
+fig.colorbar(pcmesh, ax=ax, label='firing rate [Hz]')
 plt.show()
 # -
 
