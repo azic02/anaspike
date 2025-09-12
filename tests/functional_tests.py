@@ -33,6 +33,7 @@ spike_recorder = simulation_data.spike_recorder
 # +
 from anaspike.dataclasses.interval import Interval
 from anaspike.dataclasses.histogram import EquiBins
+from anaspike.dataclasses.contig_bins_2d import ContigBins2D
 
 pop = populations['inh']
 
@@ -40,12 +41,13 @@ extent = 2.
 origin = (0., 0.)
 t_sim = 10000.
 
-n_spatial_bins = 50
-
 t_interval = Interval(2000., t_sim)
-t_bins = EquiBins.from_interval_with_median_values(t_interval, size=500.)
-x_bins = EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins)
-y_bins = EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins)
+t_bin_size = 500.
+t_bins = EquiBins.from_interval_with_median_values(t_interval, size=t_bin_size)
+
+n_spatial_bins = 50
+spatial_bins = ContigBins2D(x=EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins),
+                            y=EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins))
 
 spatial_bin_size = extent / n_spatial_bins
 time_vals = [t_bin.value for t_bin in t_bins]
@@ -89,6 +91,17 @@ tafr_histogram = construct_histogram(time_averaged_firing_rates, freq_bins)
 fig, ax = plt.subplots(figsize=(15,3))
 tafr_histogram.plot(ax)
 plt.show()
+
+# +
+from anaspike.analysis.time_averaged_firing_rate import bin_spatially
+binned_tafr = bin_spatially(time_averaged_firing_rates, pop.coords, spatial_bins)
+
+fig, ax = plt.subplots()
+ax.pcolormesh(spatial_bins.x.values, spatial_bins.y.values, np.reshape(binned_tafr, (len(spatial_bins.x.values), len(spatial_bins.y.values))),
+             vmin=0., vmax=np.max(binned_tafr),
+             cmap='Greys')
+plt.show()
+# -
 
 # ### instantaneous firing rate
 
