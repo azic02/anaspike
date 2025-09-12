@@ -21,5 +21,5 @@ def construct_histogram(fr: TimeAveragedFiringRate, bins: ContigBins) -> Histogr
 def bin_spatially(fr: TimeAveragedFiringRate, coords: Coords2D, bins: ContigBins2D) -> TimeAveragedFiringRate:
     if len(fr.as_nparray) != len(coords):
         raise ValueError("Length of firing rates and coordinates must be the same.")
-    return TimeAveragedFiringRate(np.reshape(calculate_bin_means_2d(bins, coords, fr.as_nparray), -1))
+    return TimeAveragedFiringRate(np.reshape(np.transpose(calculate_bin_means_2d(bins, coords, fr.as_nparray)), -1))
 

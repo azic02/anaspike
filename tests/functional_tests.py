@@ -106,7 +106,7 @@ from anaspike.analysis.time_averaged_firing_rate import bin_spatially
 binned_tafr = bin_spatially(time_averaged_firing_rates, pop.coords, spatial_bins)
 
 fig, ax = plt.subplots()
-pcmesh = ax.pcolormesh(spatial_bins.x.values, spatial_bins.y.values, np.reshape(binned_tafr, (len(spatial_bins.y.values), len(spatial_bins.x.values))),
+pcmesh = ax.pcolormesh(spatial_bins.x.values, spatial_bins.y.values, np.reshape(binned_tafr, (len(spatial_bins.x.values), len(spatial_bins.y.values))),
              vmin=0.,
              cmap='Greys')
 ax.set_xlabel('cortical space [mm]')

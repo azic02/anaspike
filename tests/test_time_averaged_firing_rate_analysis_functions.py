@@ -117,8 +117,9 @@ class TestBinSpatiallySuccessful(TestBinSpatiallyIncompatibleLengths):
                                     y=np.array([1.5, 0.7, 0.2, 0.9, 1.9, 1.4, 0.8]))
         self.bins = self.ContigBins2D(self.EquiBins.from_interval_with_median_values(self.Interval(0, 1), n=2),
                                       self.EquiBins.from_interval_with_median_values(self.Interval(0, 2), n=3))
-        self.expected_firing_rates = TimeAveragedFiringRate(np.array([np.nan, 2., 12./3,
-                                                                      3., 11./2, np.nan]))
+        self.expected_firing_rates = TimeAveragedFiringRate(np.array([np.nan, 3.,
+                                                                      2.    , 11./2,
+                                                                      12./3 , np.nan]))
                                                
     def test(self):
         from anaspike.analysis.time_averaged_firing_rate import bin_spatially
