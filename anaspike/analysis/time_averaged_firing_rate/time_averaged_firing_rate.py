@@ -6,25 +6,32 @@ from numpy.typing import NDArray, DTypeLike
 from ...hdf5_mixin import HDF5Mixin
 from ...dataclasses import SpikeTrainArray
 from ...dataclasses.interval import Interval
+from ...dataclasses.coords2d import Coords2D
+from ...dataclasses.field import Field2D
 
 
 
-class TimeAveragedFiringRate(HDF5Mixin):
-    def __init__(self, firing_rates: NDArray[np.float64]):
+class TimeAveragedFiringRate(Field2D[np.float64], HDF5Mixin):
+    def __init__(self, coords: Coords2D, firing_rates: NDArray[np.float64]):
         if firing_rates.ndim != 1:
             raise ValueError("firing_rates must be a 1D array")
-
-        self.__firing_rates = np.array(firing_rates, dtype=np.float64)
+        super().__init__(coords, firing_rates)
 
     @classmethod
-    def from_spike_trains(cls, spike_trains: SpikeTrainArray, time_window: Interval, time_unit: float=1.e-3):
+    def from_spike_trains(cls, coords: Coords2D, spike_trains: SpikeTrainArray, time_window: Interval, time_unit: float=1.e-3):
         spike_counts = np.array([np.sum(time_window.contains(st)) for st in spike_trains])
-        return cls(spike_counts / (time_window.width * time_unit))
+        return cls(coords, spike_counts / (time_window.width * time_unit))
 
     @property
-    def as_nparray(self) -> NDArray[np.float64]:
-        return self.__firing_rates
+    def firing_rates(self) -> NDArray[np.float64]:
+        return self.elements
 
     def __array__(self, dtype: Union[DTypeLike, None] = None, copy: Union[bool, None] = None):
-        return np.array(self.__firing_rates, dtype=dtype, copy=copy)
+        return np.array(self.firing_rates, dtype=dtype, copy=copy)
+
+    @property
+    def shape(self):
+        return self.firing_rates.shape
+
+
 

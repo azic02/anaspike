@@ -9,6 +9,7 @@ from anaspike.dataclasses.contig_bins_2d import (ContigBins2D,
                                                  calculate_bin_means)
 from anaspike.dataclasses.histogram import ContigBins
 from anaspike.dataclasses.coords2d import Coords2D
+from anaspike.dataclasses.field import Field2D
 
 
 
@@ -46,66 +47,62 @@ class TestCalculateBinCounts(TestClassSetup):
                                     [0, 0],
                                     [0, 1]])
         bin_counts = calculate_bin_counts(self.bins, self.coords)
-        np.testing.assert_array_equal(bin_counts, expected_counts)
+        np.testing.assert_array_equal(bin_counts.elements, expected_counts)
 
 class TestCalculateBinSums(TestClassSetup):
     def test_coords_outside_bins(self):
-        arr = np.array(np.arange(4) + 1, dtype=np.float64)
+        field = Field2D(self.coords_outside_bins,
+                        np.array(np.arange(4) + 1, dtype=np.float64))
         with self.assertRaises(ValueError):
-            calculate_bin_sums(self.bins, self.coords_outside_bins, arr)
-
-    def test_arr_coords_length_mismatch(self):
-        arr = np.array(np.arange(3) + 1, dtype=np.float64)
-        with self.assertRaises(ValueError):
-            calculate_bin_sums(self.bins, self.coords, arr)
+            calculate_bin_sums(self.bins, field)
 
     def test_calculate_bin_sums_1d(self):
-        arr = np.array(np.arange(4) + 1, dtype=np.float64)
+        field = Field2D(self.coords,
+                      np.array(np.arange(4) + 1, dtype=np.float64))
         expected_sums = np.array([[1, 6],
                                   [0, 0],
                                   [0, 3]])
-        bin_sums = calculate_bin_sums(self.bins, self.coords, arr)
-        np.testing.assert_array_almost_equal(bin_sums, expected_sums)
+        bin_sums = calculate_bin_sums(self.bins, field)
+        np.testing.assert_array_almost_equal(bin_sums.elements, expected_sums)
 
     def test_calculate_bin_sums_2d(self):
-        arr = np.array([[1, 2],
-                        [3, 4],
-                        [5, 6],
-                        [7, 8]])
+        field = Field2D(self.coords,
+                        np.array([[1, 2],
+                                  [3, 4],
+                                  [5, 6],
+                                  [7, 8]]))
         expected_sums = np.array([[[1, 2], [10, 12]],
                                   [[0, 0], [0, 0]],
                                   [[0, 0], [5, 6]]
                                  ])
-        bin_sums = calculate_bin_sums(self.bins, self.coords, arr)
-        np.testing.assert_array_almost_equal(bin_sums, expected_sums)
+        bin_sums = calculate_bin_sums(self.bins, field)
+        np.testing.assert_array_almost_equal(bin_sums.elements, expected_sums)
 
 class TestCalculateBinMeans(TestClassSetup):
     def test_coords_outside_bins(self):
-        arr = np.array(np.arange(4) + 1, dtype=np.float64)
+        field = Field2D(self.coords_outside_bins,
+                        np.array(np.arange(4) + 1, dtype=np.float64))
         with self.assertRaises(ValueError):
-            calculate_bin_means(self.bins, self.coords_outside_bins, arr)
-
-    def test_arr_coords_length_mismatch(self):
-        arr = np.array(np.arange(3) + 1, dtype=np.float64)
-        with self.assertRaises(ValueError):
-            calculate_bin_means(self.bins, self.coords, arr)
+            calculate_bin_means(self.bins, field)
 
     def test_calculate_bin_means_1d(self):
-        arr = np.array(np.arange(4) + 1, dtype=np.float64)
+        field = Field2D(self.coords,
+                        np.array(np.arange(4) + 1, dtype=np.float64))
         expected_means = np.array([[1 / 1, 6 / 2],
                                    [np.nan, np.nan],
                                    [np.nan, 3 / 1]])
-        bin_means = calculate_bin_means(self.bins, self.coords, arr)
-        np.testing.assert_array_almost_equal(bin_means, expected_means)
+        bin_means = calculate_bin_means(self.bins, field)
+        np.testing.assert_array_almost_equal(bin_means.elements, expected_means)
 
     def test_calculate_bin_means_2d(self):
-        arr = np.array([[1, 2],
-                        [3, 4],
-                        [5, 6],
-                        [7, 8]])
+        field = Field2D(self.coords,
+                        np.array([[1, 2],
+                                  [3, 4],
+                                  [5, 6],
+                                  [7, 8]]))
         expected_means = np.array([[[1 / 1, 2 / 1],  [10 / 2, 12 / 2]],
                                    [[np.nan, np.nan], [np.nan, np.nan]],
                                    [[np.nan, np.nan], [5 / 1, 6 / 1]]])
-        bin_means = calculate_bin_means(self.bins, self.coords, arr)
-        np.testing.assert_array_almost_equal(bin_means, expected_means)
+        bin_means = calculate_bin_means(self.bins, field)
+        np.testing.assert_array_almost_equal(bin_means.elements, expected_means)
 
