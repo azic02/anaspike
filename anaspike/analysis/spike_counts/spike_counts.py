@@ -6,7 +6,7 @@ from numpy.typing import NDArray, DTypeLike
 from ...dataclasses.field import Field2D
 from ...dataclasses.coords2d import Coords2D
 from ...dataclasses.interval import Interval
-from ...dataclasses.spike_train import SpikeTrainArray
+from ..spike_trains import SpikeTrainArray
 
 
 

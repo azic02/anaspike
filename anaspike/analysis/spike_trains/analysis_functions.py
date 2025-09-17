@@ -2,7 +2,7 @@ from typing import TypeVar
 
 import numpy as np
 
-from ...dataclasses.spike_train import SpikeTrainArray
+from .spike_trains import SpikeTrainArray
 from ...dataclasses.histogram import Histogram
 from ...dataclasses.bins import ContigBins1D
 from ...dataclasses.grid import Grid1D

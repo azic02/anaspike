@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray, DTypeLike
 
 from ...hdf5_mixin import HDF5Mixin
-from ...dataclasses import SpikeTrainArray
+from ..spike_trains import SpikeTrainArray
 from ...dataclasses.interval import Interval
 from ...dataclasses.coords2d import Coords2D
 from ...dataclasses.field import Field2D

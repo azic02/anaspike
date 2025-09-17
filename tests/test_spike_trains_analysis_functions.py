@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 
 from anaspike.dataclasses.bins import ContigBins1D
-from anaspike.dataclasses.spike_train import SpikeTrainArray
+from anaspike.analysis.spike_trains import SpikeTrainArray
 from anaspike.dataclasses.grid import Grid1D
 
 

@@ -44,7 +44,7 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
                                                     endpoint=True))
 
     def test_from_spike_trains(self):
-        from anaspike.dataclasses.spike_train import SpikeTrainArray
+        from anaspike.analysis.spike_trains import SpikeTrainArray
         spike_trains = SpikeTrainArray([
             np.array([0.1, 0.5]),
             np.array([1.1, 2.1, 2.5]),
