@@ -12,7 +12,7 @@ from anaspike.dataclasses.coords2d import Coords2D
 class TestSpikeCountsFromSpikeTrains(unittest.TestCase):
     def setUp(self):
         self.coords = Coords2D(np.arange(3), np.arange(3))
-        self.spike_trains = SpikeTrains([
+        self.spike_trains = SpikeTrains(self.coords, [
                     np.array([10, 20, 30, 40, 50], dtype=np.float64),
                     np.array([15, 25, 35], dtype=np.float64),
                     np.array([], dtype=np.float64 )
@@ -35,7 +35,8 @@ class TestSpikeCountsFromSpikeTrains(unittest.TestCase):
         np.testing.assert_array_equal(counts, np.array([0, 0, 0]))
 
     def test_single_neuron(self):
-        spike_train = SpikeTrains([self.spike_trains[0]])
+        coords = Coords2D([0], [0])
+        spike_train = SpikeTrains(coords, [self.spike_trains[0]])
         counts = SpikeCounts.from_spike_trains(self.coords[0], spike_train, self.t_interval_partial)
         np.testing.assert_array_equal(counts, np.array([2]))
 

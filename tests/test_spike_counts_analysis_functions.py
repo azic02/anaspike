@@ -19,10 +19,10 @@ class CalculateActiveNeuronFractionTestCase(unittest.TestCase):
 class TestCalculateActiveNeuronFractionSomeActive(CalculateActiveNeuronFractionTestCase):
     def setUp(self):
         self.coords = Coords2D(np.arange(4), np.arange(4))
-        self.spike_trains = SpikeTrains([np.array([0, 0.1]),
-                                                  np.array([1.0, 1.2]),
-                                                  np.array([0.3]),
-                                                  np.array([])])
+        self.spike_trains = SpikeTrains(self.coords, [np.array([0, 0.1]),
+                                                      np.array([1.0, 1.2]),
+                                                      np.array([0.3]),
+                                                      np.array([])])
 
         self.expected_fraction = 3. / 4
 
@@ -34,9 +34,9 @@ class TestCalculateActiveNeuronFractionSomeActive(CalculateActiveNeuronFractionT
 class TestCalculateActiveNeuronFractionNoneActive(CalculateActiveNeuronFractionTestCase):
     def setUp(self):
         self.coords = Coords2D(np.arange(3), np.arange(3))
-        self.spike_trains = SpikeTrains([np.array([]),
-                                             np.array([]),
-                                             np.array([])])
+        self.spike_trains = SpikeTrains(self.coords, [np.array([]),
+                                                      np.array([]),
+                                                      np.array([])])
 
         self.expected_fraction = 0.0
 
@@ -48,9 +48,9 @@ class TestCalculateActiveNeuronFractionNoneActive(CalculateActiveNeuronFractionT
 class TestCalculateActiveNeuronFractionAllActive(CalculateActiveNeuronFractionTestCase):
     def setUp(self):
         self.coords = Coords2D(np.arange(3), np.arange(3))
-        self.spike_trains = SpikeTrains([np.array([0]),
-                                             np.array([1.0]),
-                                             np.array([0.3])])
+        self.spike_trains = SpikeTrains(self.coords, [np.array([0]),
+                                                      np.array([1.0]),
+                                                      np.array([0.3])])
 
         self.expected_fraction = 1.0
 

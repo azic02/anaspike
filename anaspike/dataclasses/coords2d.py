@@ -1,3 +1,5 @@
+from typing import Union
+
 import numpy as np
 from numpy.typing import NDArray, ArrayLike
 
@@ -27,6 +29,8 @@ class Coords2D(HDF5Mixin):
     def __len__(self):
         return len(self.__x)
 
-    def __getitem__(self, idx: int) -> "Coords2D":
-        return Coords2D(self.__x[idx:idx+1], self.__y[idx:idx+1])
+    def __getitem__(self, s: Union[int, slice, NDArray[np.int64]]) -> "Coords2D":
+        if isinstance(s, int):
+            return Coords2D(self.__x[s:s+1], self.__y[s:s+1])
+        return Coords2D(self.__x[s], self.__y[s])
 
