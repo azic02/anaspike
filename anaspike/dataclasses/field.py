@@ -47,8 +47,6 @@ class GridField2D(Generic[GridT, SigT]):
     def __init__(self, grid: GridT, elements: NDArray[SigT]):
         if elements.ndim < 2:
             raise ValueError("elements must be at least a two-dimensional array.")
-        if elements.shape[0] < 2 or elements.shape[1] < 2:
-            raise ValueError("elements must contain at least two elements in the first two dimensions.")
         if grid.N != elements.shape[0] * elements.shape[1]:
             raise ValueError("number of points in coordinate grid (`grid.N`) must match the number of elements in `elements`.")
         

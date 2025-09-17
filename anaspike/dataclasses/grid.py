@@ -1,16 +1,17 @@
+from typing import Union, overload
+
 import numpy as np
 from numpy.typing import NDArray
 
 from .interval import Interval
+from ..hdf5_mixin import HDF5Mixin
 
 
 
-class Grid1D:
+class Grid1D(HDF5Mixin):
     def __init__(self, points: NDArray[np.float64]):
         if points.ndim != 1:
             raise ValueError("points must be a one-dimensional array.")
-        if len(points) < 2:
-            raise ValueError("points must contain at least two points.")
         if not np.all(np.diff(points) > 0):
             raise ValueError("points must be strictly increasing.")
         
@@ -19,6 +20,8 @@ class Grid1D:
     def __array__(self) -> NDArray[np.float64]:
         return self.points
 
+        return self.points[s]
+
     @property
     def points(self) -> NDArray[np.float64]:
         return self.__points
@@ -26,6 +29,19 @@ class Grid1D:
     @property
     def n(self) -> int:
         return len(self.points)
+
+    def __len__(self) -> int:
+        return len(self.points)
+
+    @overload
+    def __getitem__(self, s: int) -> float: ...
+    @overload
+    def __getitem__(self, s: slice) -> NDArray[np.float64]: ...
+    def __getitem__(self, s: Union[int, slice]) -> Union[float, NDArray[np.float64]]:
+        return self.points[s]
+
+    def __iter__(self):
+        return (self[i] for i in range(len(self.points)))
 
 
 class RegularGrid1D(Grid1D):
@@ -46,6 +62,13 @@ class RegularGrid1D(Grid1D):
         return cls(points)
 
     @classmethod
+    def given_n_with_endpoint(cls, interval: Interval, n: int) -> "RegularGrid1D":
+        if n < 2:
+            raise ValueError("n must be at least 2.")
+        points = np.linspace(interval.start, interval.end, n, endpoint=True, dtype=np.float64)
+        return cls(points)
+
+    @classmethod
     def given_delta(cls, interval: Interval, delta: float) -> "RegularGrid1D":
         if delta <= 0:
             raise ValueError("`delta` must be positive.")
@@ -57,7 +80,7 @@ class RegularGrid1D(Grid1D):
         return self.points[1] - self.points[0]
 
 
-class RectilinearGrid2D:
+class RectilinearGrid2D(HDF5Mixin):
     def __init__(self, x: Grid1D, y: Grid1D):
         self.__x = x
         self.__y = y

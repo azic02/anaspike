@@ -7,6 +7,9 @@ from anaspike.analysis.time_averaged_firing_rate import (TimeAveragedFiringRate,
                                                          std,
                                                          construct_histogram)
 from anaspike.dataclasses.coords2d import Coords2D
+from anaspike.dataclasses.bins import ContigBins1D
+from anaspike.dataclasses.grid import RegularGrid1D
+from anaspike.dataclasses.interval import Interval
 
 
 
@@ -46,33 +49,25 @@ class TestStd(unittest.TestCase):
         self.assertAlmostEqual(expected_result, std(fr))
 
 
-class HistogramTestCase(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        from anaspike.dataclasses.histogram import EquiBins
-        cls.EquiBins = EquiBins
-        from anaspike.dataclasses.interval import Interval
-        cls.Interval = Interval
-
-class TestHistogramConstantFiringRate(HistogramTestCase):
+class TestHistogramConstantFiringRate(unittest.TestCase):
     def setUp(self):
         n = 10
         self.fr = TimeAveragedFiringRate(Coords2D(np.arange(n), np.arange(n)),
                                          np.ones(n))
-        self.interval = self.Interval(0, 2)
+        self.interval = Interval(0, 2)
         self.n_bins = 2
 
-        self.expected_bin_edges = np.array([0, 1, 2])
+        self.expected_edges = np.array([0, 1, 2])
         self.expected_counts = np.array([0, 10])
 
     def test(self):
-        bins = self.EquiBins.from_interval_with_median_values(self.interval, self.n_bins)
+        bins = ContigBins1D[RegularGrid1D].with_median_values(RegularGrid1D.given_n_with_endpoint(self.interval, self.n_bins + 1))
         histogram = construct_histogram(self.fr, bins)
 
-        np.testing.assert_array_equal(self.expected_bin_edges, histogram.bin_edges)
+        np.testing.assert_array_equal(self.expected_edges, histogram.edges)
         np.testing.assert_array_equal(self.expected_counts, histogram.counts)
 
-class TestHistogramAscendingFiringRate(HistogramTestCase):
+class TestHistogramAscendingFiringRate(unittest.TestCase):
     def setUp(self):
         self.start = 0.
         self.stop = 10.
@@ -81,27 +76,28 @@ class TestHistogramAscendingFiringRate(HistogramTestCase):
                                                   np.arange(self.n_fr)),
                                          np.linspace(self.start, self.stop, self.n_fr, dtype=np.float64))
 
-        self.interval = self.Interval(0, 10)
+        self.interval = Interval(0, 10)
         self.n_bins = 5
 
-        self.expected_bin_edges = np.array([0, 2, 4, 6, 8, 10])
+        self.expected_edges = np.array([0, 2, 4, 6, 8, 10])
         self.expected_counts = np.array([2, 2, 2, 2, 2])
 
     def test(self):
-        bins = self.EquiBins.from_interval_with_median_values(self.interval, self.n_bins)
+        bins = ContigBins1D[RegularGrid1D].with_median_values(RegularGrid1D.given_n_with_endpoint(self.interval, self.n_bins + 1))
         histogram = construct_histogram(self.fr, bins)
 
-        np.testing.assert_array_equal(self.expected_bin_edges, histogram.bin_edges)
+        np.testing.assert_array_equal(self.expected_edges, histogram.edges)
         np.testing.assert_array_equal(self.expected_counts, histogram.counts)
 
 
 class BinSpatiallyTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        from anaspike.dataclasses.contig_bins_2d import ContigBins2D
+        from anaspike.dataclasses.bins import ContigBins2D
         cls.ContigBins2D = ContigBins2D
-        from anaspike.dataclasses.histogram import EquiBins
-        cls.EquiBins = EquiBins
+        from anaspike.dataclasses.grid import RegularGrid2D, RegularGrid1D
+        cls.RegularGrid2D = RegularGrid2D
+        cls.RegularGrid1D = RegularGrid1D
         from anaspike.dataclasses.interval import Interval
         cls.Interval = Interval
         from anaspike.dataclasses.coords2d import Coords2D
@@ -111,12 +107,16 @@ class BinSpatiallyTestCase(unittest.TestCase):
 class TestBinSpatiallySuccessful(BinSpatiallyTestCase):
     def setUp(self):
         import numpy as np
+        from anaspike.dataclasses.bins import ContigBins2D
+        from anaspike.dataclasses.grid import RegularGrid2D, RegularGrid1D
+        from anaspike.dataclasses.interval import Interval
         self.fr = TimeAveragedFiringRate(
                 self.Coords2D(x=np.array([0.1, 0.4, 0.6, 0.8, 0.2, 0.3, 0.5]),
                               y=np.array([1.5, 0.7, 0.2, 0.9, 1.9, 1.4, 0.8])),
                 np.array([1, 2, 3, 4, 5, 6, 7]))
-        self.bins = self.ContigBins2D(self.EquiBins.from_interval_with_median_values(self.Interval(0, 1), n=2),
-                                      self.EquiBins.from_interval_with_median_values(self.Interval(0, 2), n=3))
+        bin_grid = RegularGrid2D(RegularGrid1D.given_n_with_endpoint(Interval(0., 1.), n=3),
+                                 RegularGrid1D.given_n_with_endpoint(Interval(0., 2.), n=4))
+        self.bins = ContigBins2D[RegularGrid2D].with_median_values(bin_grid)
         self.expected_firing_rates = np.array([[np.nan, 3.],
                                                [2.    , 11./2],
                                                [12./3 , np.nan]]).T

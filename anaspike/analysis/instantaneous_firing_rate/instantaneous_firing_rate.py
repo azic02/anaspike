@@ -4,7 +4,9 @@ from numpy.typing import NDArray
 from ...hdf5_mixin import HDF5Mixin
 from ...dataclasses.spike_train import SpikeTrainArray
 from ...dataclasses.nest_devices import PopulationData, SpikeRecorderData
-from ...dataclasses.histogram import EquiBins, Histogram
+from ...dataclasses.histogram import Histogram
+from ...dataclasses.grid import RegularGrid1D
+from ...dataclasses.bins import ContigBins1D
 
 
 
@@ -21,15 +23,17 @@ class InstantaneousFiringRates(HDF5Mixin):
         self.__firing_rates = firing_rates
 
     @classmethod
-    def from_spike_trains(cls, spike_trains: SpikeTrainArray, time_bins: EquiBins) -> "InstantaneousFiringRates":
+    def from_spike_trains(cls, spike_trains: SpikeTrainArray,
+                          time_bins: ContigBins1D[RegularGrid1D]) -> "InstantaneousFiringRates":
         spike_counts = np.array([Histogram.construct_by_counting(bins=time_bins, data=st).counts for st in spike_trains])
         return cls(
             times=time_bins.values,
-            firing_rates=np.array(spike_counts) / time_bins.bin_width * 1.e3
+            firing_rates=np.array(spike_counts) / time_bins.edges.delta * 1.e3
         )
 
     @classmethod
-    def from_nest(cls, pop: PopulationData, sr: SpikeRecorderData, time_bins: EquiBins) -> "InstantaneousFiringRates":
+    def from_nest(cls, pop: PopulationData, sr: SpikeRecorderData,
+                  time_bins: ContigBins1D[RegularGrid1D]) -> "InstantaneousFiringRates":
         spike_trains = SpikeTrainArray.from_nest(pop=pop, sr=sr)
         return cls.from_spike_trains(spike_trains=spike_trains, time_bins=time_bins)
 

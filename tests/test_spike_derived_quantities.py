@@ -8,7 +8,8 @@ from anaspike.functions.spike_derived_quantities import (spike_counts,
                                                          spike_counts_in_spacetime_region)
 from anaspike.dataclasses import SpikeTrainArray
 from anaspike.dataclasses.interval import Interval
-from anaspike.dataclasses.histogram import EquiBins
+from anaspike.dataclasses.bins import ContigBins1D
+from anaspike.dataclasses.grid import RegularGrid1D
 
 
 
@@ -95,7 +96,8 @@ class TestFiringRates(SharedSetup):
 class TestFiringRatesOverTime(SharedSetup):
     def setUp(self):
         super().setUp()
-        self.times = EquiBins.from_interval_with_median_values(Interval(0., 50.), 5)
+        n_bins = 5
+        self.times = ContigBins1D[RegularGrid1D].with_median_values(RegularGrid1D.given_n_with_endpoint(Interval(0., 50.), n=n_bins + 1))
 
     def test_all_neurons(self):
         rates = np.array([firing_rates(self.spike_trains, t_bin) for t_bin in self.times]).T
