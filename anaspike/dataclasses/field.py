@@ -13,8 +13,6 @@ class Field2D(Generic[SigT]):
     def __init__(self, coords: Coords2D, elements: NDArray[SigT]):
         if elements.ndim < 1:
             raise ValueError("elements must at least be a one-dimensional array.")
-        if elements.shape[0] < 2:
-            raise ValueError("elements must contain at least two elements.")
         if len(coords) != elements.shape[0]:
             raise ValueError("length of coords must match length of elements.")
        
