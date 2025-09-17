@@ -33,15 +33,15 @@ class Histogram(HDF5Mixin):
         return self.__bins.edges
 
     @property
-    def values(self) -> NDArray[np.float64]:
-        return self.__bins.values
+    def labels(self) -> NDArray[np.float64]:
+        return self.__bins.labels
 
     @property
     def counts(self) -> NDArray[np.int64]:
         return self.__counts
 
     def plot(self, ax: Axes, **kwargs):
-        ax.bar(self.values, self.counts, width=np.diff(self.edges), align='center', **kwargs)
+        ax.bar(self.labels, self.counts, width=np.diff(self.edges), align='center', **kwargs)
         ax.set_ylabel('Counts')
         return ax
 

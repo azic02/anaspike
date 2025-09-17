@@ -5,33 +5,33 @@ import numpy as np
 
 
 class TestContigBins2dCreation(unittest.TestCase):
-    def test_with_median_values_rectilinear_grid(self):
+    def test_with_median_labels_rectilinear_grid(self):
         from anaspike.dataclasses.bins import ContigBins2D
         from anaspike.dataclasses.grid import RectilinearGrid2D, Grid1D
 
         grid = RectilinearGrid2D(x=Grid1D(np.array([0., 0.1, 0.4])),
                                  y=Grid1D(np.array([0.2, 0.3, 0.5, 0.9])))
 
-        expected_values = [[(0.05, 0.25), (0.05, 0.4), (0.05, 0.7)],
+        expected_labels = [[(0.05, 0.25), (0.05, 0.4), (0.05, 0.7)],
                            [(0.25, 0.25), (0.25, 0.4), (0.25, 0.7)]]
 
-        bins = ContigBins2D[RectilinearGrid2D].with_median_values(grid)
+        bins = ContigBins2D[RectilinearGrid2D].with_median_labels(grid)
 
-        np.testing.assert_array_almost_equal(bins.values, expected_values)
+        np.testing.assert_array_almost_equal(bins.labels, expected_labels)
 
-    def test_with_median_values_regular_grid(self):
+    def test_with_median_labels_regular_grid(self):
         from anaspike.dataclasses.bins import ContigBins2D
         from anaspike.dataclasses.grid import RegularGrid2D, RegularGrid1D
 
         x = RegularGrid1D(np.array([0., 0.1, 0.2]))
         y = RegularGrid1D(np.array([1., 1.3, 1.6, 1.9]))
 
-        expected_values = [[(0.05, 1.15), (0.05, 1.45), (0.05, 1.75)],
+        expected_labels = [[(0.05, 1.15), (0.05, 1.45), (0.05, 1.75)],
                            [(0.15, 1.15), (0.15, 1.45), (0.15, 1.75)]]
 
-        bins = ContigBins2D[RegularGrid2D].with_median_values(RegularGrid2D(x,y))
+        bins = ContigBins2D[RegularGrid2D].with_median_labels(RegularGrid2D(x,y))
 
-        np.testing.assert_array_almost_equal(bins.values, expected_values)
+        np.testing.assert_array_almost_equal(bins.labels, expected_labels)
 
 
 class TestContigBins2dProperties(unittest.TestCase):
@@ -42,25 +42,25 @@ class TestContigBins2dProperties(unittest.TestCase):
         self.grid = RectilinearGrid2D(x=Grid1D(np.array([0., 0.1, 0.4])),
                                  y=Grid1D(np.array([0.2, 0.3, 0.5, 0.9])))
 
-        self.bins = ContigBins2D[RectilinearGrid2D].with_median_values(self.grid)
+        self.bins = ContigBins2D[RectilinearGrid2D].with_median_labels(self.grid)
 
     def test_x(self):
         expected_edges = [0., 0.1, 0.4]
-        expected_values = [0.05, 0.25]
+        expected_labels = [0.05, 0.25]
 
         bins_x = self.bins.x
 
         np.testing.assert_array_almost_equal(bins_x.edges, expected_edges)
-        np.testing.assert_array_almost_equal(bins_x.values, expected_values)
+        np.testing.assert_array_almost_equal(bins_x.labels, expected_labels)
 
     def test_y(self):
         eypected_edges = [0.2, 0.3, 0.5, 0.9]
-        eypected_values = [0.25, 0.4, 0.7]
+        eypected_labels = [0.25, 0.4, 0.7]
 
         bins_y = self.bins.y
 
         np.testing.assert_array_almost_equal(bins_y.edges, eypected_edges)
-        np.testing.assert_array_almost_equal(bins_y.values, eypected_values)
+        np.testing.assert_array_almost_equal(bins_y.labels, eypected_labels)
 
 
 
@@ -73,7 +73,7 @@ class TestClassSetup(unittest.TestCase):
         from anaspike.dataclasses.coords2d import Coords2D
         bin_grid = RegularGrid2D(RegularGrid1D(np.array([0, 1, 2, 3])),
                                  RegularGrid1D(np.array([0, 1, 2])))
-        cls.bins = ContigBins2D[RegularGrid2D].with_median_values(bin_grid)
+        cls.bins = ContigBins2D[RegularGrid2D].with_median_labels(bin_grid)
         cls.coords = Coords2D(x=[0.5, 0.5, 2.5, 0.5],
                               y=[0.5, 1.5, 1.5, 1.5])
         cls.coords_outside_bins = Coords2D(x=[0.5, 0.5, 2.5, 3.5],
@@ -190,7 +190,7 @@ class TestCalculateBinMeans(TestClassSetup):
                 np.array([1, 2, 3, 4, 5, 6, 7]))
         bin_grid = RegularGrid2D(RegularGrid1D.given_n_with_endpoint(Interval(0., 1.), n=3),
                                  RegularGrid1D.given_n_with_endpoint(Interval(0., 2.), n=4))
-        bins = ContigBins2D[RegularGrid2D].with_median_values(bin_grid)
+        bins = ContigBins2D[RegularGrid2D].with_median_labels(bin_grid)
         expected_firing_rates = np.array([[np.nan, 3.],
                                           [2.    , 11./2],
                                           [12./3 , np.nan]]).T

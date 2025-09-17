@@ -27,7 +27,7 @@ class InstantaneousFiringRates(HDF5Mixin):
                           time_bins: ContigBins1D[RegularGrid1D]) -> "InstantaneousFiringRates":
         spike_counts = np.array([Histogram.construct_by_counting(bins=time_bins, data=st).counts for st in spike_trains])
         return cls(
-            times=time_bins.values,
+            times=time_bins.labels,
             firing_rates=np.array(spike_counts) / time_bins.edges.delta * 1.e3
         )
 

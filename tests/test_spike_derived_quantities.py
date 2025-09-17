@@ -97,7 +97,7 @@ class TestFiringRatesOverTime(SharedSetup):
     def setUp(self):
         super().setUp()
         n_bins = 5
-        self.times = ContigBins1D[RegularGrid1D].with_median_values(RegularGrid1D.given_n_with_endpoint(Interval(0., 50.), n=n_bins + 1))
+        self.times = ContigBins1D[RegularGrid1D].with_median_labels(RegularGrid1D.given_n_with_endpoint(Interval(0., 50.), n=n_bins + 1))
 
     def test_all_neurons(self):
         rates = np.array([firing_rates(self.spike_trains, t_bin) for t_bin in self.times]).T

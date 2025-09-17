@@ -38,7 +38,7 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
 
         n_bins = 3
 
-        self.time_bins = ContigBins1D[RegularGrid1D].with_median_values(RegularGrid1D.given_n_with_endpoint(Interval(0.0, 3.0), n=n_bins + 1))
+        self.time_bins = ContigBins1D[RegularGrid1D].with_median_labels(RegularGrid1D.given_n_with_endpoint(Interval(0.0, 3.0), n=n_bins + 1))
 
     def test_from_spike_trains(self):
         from anaspike.dataclasses.spike_train import SpikeTrainArray
@@ -47,7 +47,7 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
             np.array([1.1, 2.1, 2.5]),
             np.array([0.75])
         ])
-        expected_times = self.time_bins.values
+        expected_times = self.time_bins.labels
         expected_firing_rates=np.array([[2000., 0000., 0000.],
                                         [0000., 1000., 2000.],
                                         [1000., 0000., 0000.]]).T
@@ -72,7 +72,7 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
                 times=np.array([0.1, 0.5, 0.75, 1.1, 2.1, 2.5], dtype=np.float64)
                 )
 
-        expected_times = self.time_bins.values
+        expected_times = self.time_bins.labels
         expected_firing_rates=np.array([[2000., 0000., 0000.],
                                         [0000., 1000., 2000.],
                                         [1000., 0000., 0000.]]).T
