@@ -17,9 +17,9 @@ class SpikeCounts(Field2D[np.int64]):
         super().__init__(coords, counts)
 
     @classmethod
-    def from_spike_trains(cls, coords: Coords2D, spike_trains: SpikeTrains, time_window: Interval, time_unit: float=1.e-3):
+    def from_spike_trains(cls, spike_trains: SpikeTrains, time_window: Interval, time_unit: float=1.e-3):
         counts = np.array([np.sum(time_window.contains(st).astype(np.int64)) for st in spike_trains])
-        return cls(coords, counts)
+        return cls(spike_trains.coords, counts)
 
     @property
     def counts(self) -> NDArray[np.int64]:

@@ -79,7 +79,7 @@ plt.show()
 # ### spike counts
 
 from anaspike.analysis.spike_counts import SpikeCounts
-spike_counts = SpikeCounts.from_spike_trains(pop.coords, spike_trains, Interval(-np.inf, np.inf))
+spike_counts = SpikeCounts.from_spike_trains(spike_trains, Interval(-np.inf, np.inf))
 
 from anaspike.analysis.spike_counts import get_active_neurons_number
 active_neurons_number = get_active_neurons_number(spike_counts, thresh=1)
@@ -93,7 +93,7 @@ print(active_neurons_fraction)
 
 # +
 from anaspike.analysis.time_averaged_firing_rate import TimeAveragedFiringRate
-time_averaged_firing_rates = TimeAveragedFiringRate.from_spike_trains(pop.coords, spike_trains, t_interval)
+time_averaged_firing_rates = TimeAveragedFiringRate.from_spike_trains(spike_trains, t_interval)
 
 fig, ax = plt.subplots()
 scat = ax.scatter(x=pop.coords.x, y=pop.coords.y, c=time_averaged_firing_rates, vmin=0., cmap='Greys', s=10)

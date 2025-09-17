@@ -27,7 +27,7 @@ class TestCalculateActiveNeuronFractionSomeActive(CalculateActiveNeuronFractionT
         self.expected_fraction = 3. / 4
 
     def test(self):
-        sc = SpikeCounts.from_spike_trains(self.coords, self.spike_trains, self.t_interval)
+        sc = SpikeCounts.from_spike_trains(self.spike_trains, self.t_interval)
         result = get_active_neurons_fraction(sc, self.thresh)
         self.assertAlmostEqual(result, self.expected_fraction)
 
@@ -41,7 +41,7 @@ class TestCalculateActiveNeuronFractionNoneActive(CalculateActiveNeuronFractionT
         self.expected_fraction = 0.0
 
     def test(self):
-        sc = SpikeCounts.from_spike_trains(self.coords, self.spike_trains, self.t_interval)
+        sc = SpikeCounts.from_spike_trains(self.spike_trains, self.t_interval)
         result = get_active_neurons_fraction(sc, self.thresh)
         self.assertAlmostEqual(result, self.expected_fraction)
 
@@ -55,6 +55,6 @@ class TestCalculateActiveNeuronFractionAllActive(CalculateActiveNeuronFractionTe
         self.expected_fraction = 1.0
 
     def test(self):
-        sc = SpikeCounts.from_spike_trains(self.coords, self.spike_trains, self.t_interval)
+        sc = SpikeCounts.from_spike_trains(self.spike_trains, self.t_interval)
         result = get_active_neurons_fraction(sc, self.thresh)
         self.assertAlmostEqual(result, self.expected_fraction)

@@ -26,22 +26,23 @@ class TestInit(unittest.TestCase):
 class TestFromSpikeTrains(unittest.TestCase):
     def setUp(self):
         from anaspike.dataclasses.coords2d import Coords2D
+
         self.coords = Coords2D(x=[0.0, 1.0, 2.0], y=[0.0, 1.0, 2.0])
-    @patch("anaspike.dataclasses.interval.Interval")
-    @patch("anaspike.analysis.spike_trains.SpikeTrains")
-    def test_from_spike_trains(self, mock_spike_trains: MagicMock, mock_interval: MagicMock):
-        mock_spike_trains.__iter__.return_value = [
-            [0.1, 0.2, 0.3],
-            [0.4, 0.5],
-            [0.6]
-        ]
-        mock_interval.contains.side_effect = lambda st: [True for t in st if 0.15 <= t <= 0.45]
-        mock_interval.width = 0.3
+    def test_from_spike_trains(self):
+        from anaspike.dataclasses.interval import Interval
+        from anaspike.analysis.spike_trains import SpikeTrains
+
+        spike_trains = SpikeTrains(self.coords, [
+            np.array([0.1, 0.2, 0.3], dtype=np.float64),
+            np.array([0.4, 0.5], dtype=np.float64),
+            np.array([0.6], dtype=np.float64)
+        ])
+
+        interval = Interval(0.15, 0.45)
 
         fr = TimeAveragedFiringRate.from_spike_trains(
-            coords=self.coords,
-            spike_trains=mock_spike_trains,
-            time_window=mock_interval,
+            spike_trains=spike_trains,
+            time_window=interval,
             time_unit=1.e-3
         )
 
