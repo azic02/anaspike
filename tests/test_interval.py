@@ -77,7 +77,7 @@ class TestBin(unittest.TestCase):
         self.bin = Bin(0, 10, 5)
 
     def test_value(self):
-        self.assertEqual(self.bin.value, 5)
+        self.assertEqual(self.bin.label, 5)
 
 
 if __name__ == '__main__':

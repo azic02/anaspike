@@ -54,11 +54,11 @@ class Interval:
 
 
 class Bin(Interval):
-    def __init__(self, start: float, end: float, value: float):
+    def __init__(self, start: float, end: float, label: float):
         super().__init__(start, end)
-        self.__value = value
+        self.__label = label
 
     @property
-    def value(self) -> float:
-        return self.__value
+    def label(self) -> float:
+        return self.__label
 

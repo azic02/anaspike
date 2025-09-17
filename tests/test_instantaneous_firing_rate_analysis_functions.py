@@ -12,9 +12,9 @@ from anaspike.dataclasses.interval import Bin
 class TemporalCorrelationTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.t_bins = [Bin(start=float(i), end=float(i + 1), value=float(i + 0.5)) for i in range(3)]
+        cls.t_bins = [Bin(start=float(i), end=float(i + 1), label=float(i + 0.5)) for i in range(3)]
 
-        cls.times = np.array([t_bin.value for t_bin in cls.t_bins])
+        cls.times = np.array([t_bin.label for t_bin in cls.t_bins])
 
         cls.instantaneous_firing_rates = InstantaneousFiringRates(
             times=cls.times,
