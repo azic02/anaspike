@@ -1,5 +1,4 @@
 import unittest
-from typing import cast
 
 import numpy as np
 
