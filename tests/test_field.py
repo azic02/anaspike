@@ -17,8 +17,13 @@ class Test2dSineWave(CalculatePsd2dTestCase):
         from anaspike.dataclasses.grid import RegularGrid1D, RegularGrid2D
         self.fx = 5.0
         self.fy = 2.0
-        grid = RegularGrid2D(RegularGrid1D.given_n(Interval(-0.3, 0.7), 1000),
-                             RegularGrid1D.given_n(Interval(0, 0.5), 1000))
+        grid = RegularGrid2D(
+                RegularGrid1D.from_interval_given_n(Interval(-0.3, 0.7),
+                                                             1000,
+                                                    endpoint=False),
+                RegularGrid1D.from_interval_given_n(Interval(0, 0.5),
+                                                    1000,
+                                                    endpoint=False))
         zz = np.sin(2 * np.pi * (self.fx * grid.xx + self.fy * grid.yy))
         self.signal = GridField2D(grid, zz)
 

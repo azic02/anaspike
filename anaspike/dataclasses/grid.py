@@ -55,21 +55,14 @@ class RegularGrid1D(Grid1D):
         super().__init__(points)
 
     @classmethod
-    def given_n(cls, interval: Interval, n: int) -> "RegularGrid1D":
+    def from_interval_given_n(cls, interval: Interval, n: int, endpoint: bool) -> "RegularGrid1D":
         if n < 2:
             raise ValueError("n must be at least 2.")
-        points = np.linspace(interval.start, interval.end, n, endpoint=False, dtype=np.float64)
+        points = np.linspace(interval.start, interval.end, n, endpoint=endpoint, dtype=np.float64)
         return cls(points)
 
     @classmethod
-    def given_n_with_endpoint(cls, interval: Interval, n: int) -> "RegularGrid1D":
-        if n < 2:
-            raise ValueError("n must be at least 2.")
-        points = np.linspace(interval.start, interval.end, n, endpoint=True, dtype=np.float64)
-        return cls(points)
-
-    @classmethod
-    def given_delta(cls, interval: Interval, delta: float) -> "RegularGrid1D":
+    def from_interval_given_delta(cls, interval: Interval, delta: float) -> "RegularGrid1D":
         if delta <= 0:
             raise ValueError("`delta` must be positive.")
         points = np.arange(interval.start, interval.end, delta, dtype=np.float64)

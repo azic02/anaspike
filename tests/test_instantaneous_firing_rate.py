@@ -38,7 +38,10 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
 
         n_bins = 3
 
-        self.time_bins = ContigBins1D[RegularGrid1D].with_median_labels(RegularGrid1D.given_n_with_endpoint(Interval(0.0, 3.0), n=n_bins + 1))
+        self.time_bins = ContigBins1D[RegularGrid1D].with_median_labels(
+                RegularGrid1D.from_interval_given_n(Interval(0.0, 3.0),
+                                                    n=n_bins + 1,
+                                                    endpoint=True))
 
     def test_from_spike_trains(self):
         from anaspike.dataclasses.spike_train import SpikeTrainArray

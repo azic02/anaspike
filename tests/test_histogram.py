@@ -37,7 +37,10 @@ class TestHistogramConstructByCounting(unittest.TestCase):
         np.testing.assert_array_equal(histogram.counts, expected_counts)
 
     def test_construct_by_counting_regular_grid(self):
-        bins = ContigBins1D[RegularGrid1D].with_median_labels(RegularGrid1D.given_n_with_endpoint(Interval(0, 10), 6))
+        bins = ContigBins1D[RegularGrid1D].with_median_labels(
+                RegularGrid1D.from_interval_given_n(Interval(0, 10),
+                                                    6,
+                                                    endpoint=True))
         data = np.array([1.5, 2.5, 3.5, 4.5, 5.5, 6.5, 7.5, 8.5, 3.6, 3.7, 5.6])
         histogram = Histogram.construct_by_counting(bins, data)
 

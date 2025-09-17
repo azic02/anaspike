@@ -61,7 +61,10 @@ class TestHistogramConstantFiringRate(unittest.TestCase):
         self.expected_counts = np.array([0, 10])
 
     def test(self):
-        bins = ContigBins1D[RegularGrid1D].with_median_labels(RegularGrid1D.given_n_with_endpoint(self.interval, self.n_bins + 1))
+        bins = ContigBins1D[RegularGrid1D].with_median_labels(
+                RegularGrid1D.from_interval_given_n(self.interval,
+                                                    self.n_bins + 1,
+                                                    endpoint=True))
         histogram = construct_histogram(self.fr, bins)
 
         np.testing.assert_array_equal(self.expected_edges, histogram.edges)
@@ -83,7 +86,10 @@ class TestHistogramAscendingFiringRate(unittest.TestCase):
         self.expected_counts = np.array([2, 2, 2, 2, 2])
 
     def test(self):
-        bins = ContigBins1D[RegularGrid1D].with_median_labels(RegularGrid1D.given_n_with_endpoint(self.interval, self.n_bins + 1))
+        bins = ContigBins1D[RegularGrid1D].with_median_labels(
+                RegularGrid1D.from_interval_given_n(self.interval,
+                                                    self.n_bins +1,
+                                                    endpoint=True))
         histogram = construct_histogram(self.fr, bins)
 
         np.testing.assert_array_equal(self.expected_edges, histogram.edges)
@@ -114,8 +120,12 @@ class TestBinSpatiallySuccessful(BinSpatiallyTestCase):
                 self.Coords2D(x=np.array([0.1, 0.4, 0.6, 0.8, 0.2, 0.3, 0.5]),
                               y=np.array([1.5, 0.7, 0.2, 0.9, 1.9, 1.4, 0.8])),
                 np.array([1, 2, 3, 4, 5, 6, 7]))
-        bin_grid = RegularGrid2D(RegularGrid1D.given_n_with_endpoint(Interval(0., 1.), n=3),
-                                 RegularGrid1D.given_n_with_endpoint(Interval(0., 2.), n=4))
+        bin_grid = RegularGrid2D(RegularGrid1D.from_interval_given_n(Interval(0., 1.),
+                                                          n=3,
+                                                          endpoint=True),
+                                 RegularGrid1D.from_interval_given_n(Interval(0., 2.),
+                                                                     n=4,
+                                                                     endpoint=True))
         self.bins = ContigBins2D[RegularGrid2D].with_median_labels(bin_grid)
         self.expected_firing_rates = np.array([[np.nan, 3.],
                                                [2.    , 11./2],
