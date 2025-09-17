@@ -68,6 +68,25 @@ class RegularGrid1D(Grid1D):
         points = np.arange(interval.start, interval.end, delta, dtype=np.float64)
         return cls(points)
 
+    @classmethod
+    def from_str(cls, spec: str) -> "RegularGrid1D":
+        try:
+            parts = spec.split(',')
+            if len(parts) != 3:
+                raise ValueError("Specification string must have three parts separated by commas.")
+            start = float(parts[0])
+            end = float(parts[1])
+            if parts[2].startswith('n'):
+                n = int(parts[2][1:])
+                return cls.from_interval_given_n(Interval(start, end), n, endpoint=True)
+            elif parts[2].startswith('d'):
+                delta = float(parts[2][1:])
+                return cls.from_interval_given_delta(Interval(start, end), delta)
+            else:
+                raise ValueError("Third part of specification must start with 'n' or 'd'.")
+        except Exception as e:
+            raise ValueError(f"Invalid specification string: {spec}. Interval string must be in the format '<start>,<end>,n<n_bins>' or '<start>,<end>,d<delta>'") from e
+
     @property
     def delta(self) -> float:
         return self.points[1] - self.points[0]
