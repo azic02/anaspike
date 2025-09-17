@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray, DTypeLike
 
 from ...hdf5_mixin import HDF5Mixin
-from ..spike_trains import SpikeTrainArray
+from ..spike_trains import SpikeTrains
 from ...dataclasses.interval import Interval
 from ...dataclasses.coords2d import Coords2D
 from ...dataclasses.field import Field2D
@@ -18,7 +18,7 @@ class TimeAveragedFiringRate(Field2D[np.float64], HDF5Mixin):
         super().__init__(coords, firing_rates)
 
     @classmethod
-    def from_spike_trains(cls, coords: Coords2D, spike_trains: SpikeTrainArray, time_window: Interval, time_unit: float=1.e-3):
+    def from_spike_trains(cls, coords: Coords2D, spike_trains: SpikeTrains, time_window: Interval, time_unit: float=1.e-3):
         spike_counts = np.array([np.sum(time_window.contains(st)) for st in spike_trains])
         return cls(coords, spike_counts / (time_window.width * time_unit))
 

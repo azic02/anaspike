@@ -3,14 +3,14 @@ import unittest
 import numpy as np
 
 from anaspike.dataclasses.bins import ContigBins1D
-from anaspike.analysis.spike_trains import SpikeTrainArray
+from anaspike.analysis.spike_trains import SpikeTrains
 from anaspike.dataclasses.grid import Grid1D
 
 
 
 class TestConstructSpikeTimeHistogram(unittest.TestCase):
     def setUp(self):
-        self.spike_trains = SpikeTrainArray([np.array([0, 0.1, 1.2, 1.4]),
+        self.spike_trains = SpikeTrains([np.array([0, 0.1, 1.2, 1.4]),
                                              np.array([1.0, 1.2, 2.4]),
                                              np.array([0.3, 7.0])])
 
@@ -30,7 +30,7 @@ class TestConstructSpikeTimeHistogram(unittest.TestCase):
 
 class TestConstructInterspikeIntervalHistogram(unittest.TestCase):
     def setUp(self):
-        self.spike_trains = SpikeTrainArray([np.array([0, 0.1, 1.2, 1.4]),
+        self.spike_trains = SpikeTrains([np.array([0, 0.1, 1.2, 1.4]),
                                              np.array([1.0, 1.2, 2.4]),
                                              np.array([0.3, 7.0])])
 

@@ -28,7 +28,7 @@ class TestFromSpikeTrains(unittest.TestCase):
         from anaspike.dataclasses.coords2d import Coords2D
         self.coords = Coords2D(x=[0.0, 1.0, 2.0], y=[0.0, 1.0, 2.0])
     @patch("anaspike.dataclasses.interval.Interval")
-    @patch("anaspike.analysis.spike_trains.SpikeTrainArray")
+    @patch("anaspike.analysis.spike_trains.SpikeTrains")
     def test_from_spike_trains(self, mock_spike_trains: MagicMock, mock_interval: MagicMock):
         mock_spike_trains.__iter__.return_value = [
             [0.1, 0.2, 0.3],

@@ -4,7 +4,7 @@ import numpy as np
 
 from anaspike.analysis.spike_counts import (SpikeCounts,
                                             get_active_neurons_fraction)
-from anaspike.analysis.spike_trains import SpikeTrainArray
+from anaspike.analysis.spike_trains import SpikeTrains
 from anaspike.dataclasses.interval import Interval
 from anaspike.dataclasses.coords2d import Coords2D
 
@@ -19,7 +19,7 @@ class CalculateActiveNeuronFractionTestCase(unittest.TestCase):
 class TestCalculateActiveNeuronFractionSomeActive(CalculateActiveNeuronFractionTestCase):
     def setUp(self):
         self.coords = Coords2D(np.arange(4), np.arange(4))
-        self.spike_trains = SpikeTrainArray([np.array([0, 0.1]),
+        self.spike_trains = SpikeTrains([np.array([0, 0.1]),
                                                   np.array([1.0, 1.2]),
                                                   np.array([0.3]),
                                                   np.array([])])
@@ -34,7 +34,7 @@ class TestCalculateActiveNeuronFractionSomeActive(CalculateActiveNeuronFractionT
 class TestCalculateActiveNeuronFractionNoneActive(CalculateActiveNeuronFractionTestCase):
     def setUp(self):
         self.coords = Coords2D(np.arange(3), np.arange(3))
-        self.spike_trains = SpikeTrainArray([np.array([]),
+        self.spike_trains = SpikeTrains([np.array([]),
                                              np.array([]),
                                              np.array([])])
 
@@ -48,7 +48,7 @@ class TestCalculateActiveNeuronFractionNoneActive(CalculateActiveNeuronFractionT
 class TestCalculateActiveNeuronFractionAllActive(CalculateActiveNeuronFractionTestCase):
     def setUp(self):
         self.coords = Coords2D(np.arange(3), np.arange(3))
-        self.spike_trains = SpikeTrainArray([np.array([0]),
+        self.spike_trains = SpikeTrains([np.array([0]),
                                              np.array([1.0]),
                                              np.array([0.3])])
 

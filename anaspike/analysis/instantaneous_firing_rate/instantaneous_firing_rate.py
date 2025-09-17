@@ -6,7 +6,7 @@ from ...dataclasses.nest_devices import PopulationData, SpikeRecorderData
 from ...dataclasses.histogram import Histogram
 from ...dataclasses.grid import RegularGrid1D
 from ...dataclasses.bins import ContigBins1D
-from ..spike_trains import SpikeTrainArray
+from ..spike_trains import SpikeTrains
 
 
 
@@ -23,7 +23,7 @@ class InstantaneousFiringRates(HDF5Mixin):
         self.__firing_rates = firing_rates
 
     @classmethod
-    def from_spike_trains(cls, spike_trains: SpikeTrainArray,
+    def from_spike_trains(cls, spike_trains: SpikeTrains,
                           time_bins: ContigBins1D[RegularGrid1D]) -> "InstantaneousFiringRates":
         spike_counts = np.array([Histogram.construct_by_counting(bins=time_bins, data=st).counts for st in spike_trains])
         return cls(
@@ -34,7 +34,7 @@ class InstantaneousFiringRates(HDF5Mixin):
     @classmethod
     def from_nest(cls, pop: PopulationData, sr: SpikeRecorderData,
                   time_bins: ContigBins1D[RegularGrid1D]) -> "InstantaneousFiringRates":
-        spike_trains = SpikeTrainArray.from_nest(pop=pop, sr=sr)
+        spike_trains = SpikeTrains.from_nest(pop=pop, sr=sr)
         return cls.from_spike_trains(spike_trains=spike_trains, time_bins=time_bins)
 
     @property

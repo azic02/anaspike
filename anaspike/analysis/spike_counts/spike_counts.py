@@ -6,7 +6,7 @@ from numpy.typing import NDArray, DTypeLike
 from ...dataclasses.field import Field2D
 from ...dataclasses.coords2d import Coords2D
 from ...dataclasses.interval import Interval
-from ..spike_trains import SpikeTrainArray
+from ..spike_trains import SpikeTrains
 
 
 
@@ -17,7 +17,7 @@ class SpikeCounts(Field2D[np.int64]):
         super().__init__(coords, counts)
 
     @classmethod
-    def from_spike_trains(cls, coords: Coords2D, spike_trains: SpikeTrainArray, time_window: Interval, time_unit: float=1.e-3):
+    def from_spike_trains(cls, coords: Coords2D, spike_trains: SpikeTrains, time_window: Interval, time_unit: float=1.e-3):
         counts = np.array([np.sum(time_window.contains(st).astype(np.int64)) for st in spike_trains])
         return cls(coords, counts)
 
