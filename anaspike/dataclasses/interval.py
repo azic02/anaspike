@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, overload, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -32,7 +32,11 @@ class Interval:
     def width(self) -> float:
         return self.end - self.start
 
-    def contains(self, x: float) -> bool:
+    @overload
+    def contains(self, x: float) -> bool: ...
+    @overload
+    def contains(self, x: NDArray[np.float64]) -> NDArray[np.bool_]: ...
+    def contains(self, x: Union[float, NDArray[np.float64]]) -> Union[bool, NDArray[np.bool_]]:
         return (self.start <= x) & (x < self.end)
 
     def discretize(self, n: Optional[int] = None, size: Optional[float] = None) -> NDArray[np.float64]:

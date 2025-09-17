@@ -27,11 +27,18 @@ class TestInterval(unittest.TestCase):
         self.assertEqual(self.interval.end, 10)
         self.assertEqual(self.interval.width, 10)
 
-    def test_interval_contains(self):
+    def test_interval_contains_single_value(self):
         self.assertTrue(self.interval.contains(5))
         self.assertTrue(self.interval.contains(0))
         self.assertFalse(self.interval.contains(-1))
         self.assertFalse(self.interval.contains(10))
+
+    def test_interval_contains_array(self):
+        import numpy as np
+        arr = np.array([-1, 0, 5, 10, 11])
+        expected = np.array([False, True, True, False, False])
+        result = self.interval.contains(arr)
+        np.testing.assert_array_equal(result, expected)
 
     def test_discretize_given_n(self):
         result = self.interval.discretize(6)
