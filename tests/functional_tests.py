@@ -32,49 +32,62 @@ spike_recorder = simulation_data.spike_recorder
 
 # +
 from anaspike.dataclasses.interval import Interval
-from anaspike.dataclasses.histogram import EquiBins
-from anaspike.dataclasses.contig_bins_2d import ContigBins2D
+from anaspike.dataclasses.bins import ContigBins1D, ContigBins2D
+from anaspike.dataclasses.grid import RegularGrid1D, RegularGrid2D
 
 pop = populations['inh']
 
 extent = 2.
 origin = (0., 0.)
+x_extent = Interval( origin[0] - extent / 2., origin[0] + extent / 2.)
+y_extent = Interval( origin[1] - extent / 2., origin[1] + extent / 2.)
 t_sim = 10000.
 
 t_interval = Interval(2000., t_sim)
 t_bin_size = 500.
-t_bins = EquiBins.from_interval_with_median_values(t_interval, size=t_bin_size)
+t_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_d(t_interval, t_bin_size))
 
 n_spatial_bins = 50
-spatial_bins = ContigBins2D(x=EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins),
-                            y=EquiBins.from_interval_with_median_values(Interval(-extent / 2., extent / 2.), n_spatial_bins))
+spatial_bins = ContigBins2D.with_median_labels(RegularGrid2D(x=RegularGrid1D.from_interval_given_n(x_extent, n_spatial_bins, endpoint=True),
+                                                             y=RegularGrid1D.from_interval_given_n(x_extent, n_spatial_bins, endpoint=True)))
 
 spatial_bin_size = extent / n_spatial_bins
-time_vals = [t_bin.value for t_bin in t_bins]
+time_vals = t_bins.labels
 # -
 
 # ## analysis
 
 # ### spike trains
 
-from anaspike.dataclasses.spike_train import SpikeTrainArray
-spike_trains = SpikeTrainArray.from_nest(pop, spike_recorder)
+from anaspike.analysis.spike_trains import SpikeTrains
+spike_trains = SpikeTrains.from_nest(pop, spike_recorder)
 
 from anaspike.analysis.spike_trains import construct_spike_time_histogram
-spike_time_histogram = construct_spike_time_histogram(spike_trains, EquiBins.from_interval_with_median_values(t_interval, n=300))
+spike_time_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_n(t_interval, n=300, endpoint=True))
+spike_time_histogram = construct_spike_time_histogram(spike_trains, spike_time_bins)
 fig, ax = plt.subplots(figsize=(15,3))
 spike_time_histogram.plot(ax)
 plt.show()
 
 from anaspike.analysis.spike_trains import construct_interspike_interval_histogram
-interspike_interval_histogram = construct_interspike_interval_histogram(spike_trains, EquiBins.from_interval_with_median_values(Interval(0,400), n=100))
+spike_interval_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_n(Interval(0,400), n=100, endpoint=True))
+interspike_interval_histogram = construct_interspike_interval_histogram(spike_trains, spike_interval_bins)
 fig, ax = plt.subplots(figsize=(15,3))
 interspike_interval_histogram.plot(ax)
 plt.show()
 
-from anaspike.analysis.spike_trains import calculate_active_neuron_fraction
-active_neuron_fraction = calculate_active_neuron_fraction(spike_trains, t_interval, thresh=1)
-print(active_neuron_fraction)
+# ### spike counts
+
+from anaspike.analysis.spike_counts import SpikeCounts
+spike_counts = SpikeCounts.from_spike_trains(pop.coords, spike_trains, Interval(-np.inf, np.inf))
+
+from anaspike.analysis.spike_counts import get_active_neurons_number
+active_neurons_number = get_active_neurons_number(spike_counts, thresh=1)
+print(active_neurons_number)
+
+from anaspike.analysis.spike_counts import get_active_neurons_fraction
+active_neurons_fraction = get_active_neurons_fraction(spike_counts, thresh=1)
+print(active_neurons_fraction)
 
 # ### time averaged firing rate
 
@@ -95,7 +108,7 @@ from anaspike.analysis.time_averaged_firing_rate import std as tafr_std
 print(tafr_mean(time_averaged_firing_rates), tafr_std(time_averaged_firing_rates))
 
 from anaspike.analysis.time_averaged_firing_rate import construct_histogram
-freq_bins = EquiBins.from_interval_with_median_values(Interval(0., 5.), n=20)
+freq_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_n(Interval(0., 5.), n=20, endpoint=True))
 tafr_histogram = construct_histogram(time_averaged_firing_rates, freq_bins)
 fig, ax = plt.subplots(figsize=(15,3))
 tafr_histogram.plot(ax)
