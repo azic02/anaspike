@@ -27,3 +27,6 @@ class Coords2D(HDF5Mixin):
     def __len__(self):
         return len(self.__x)
 
+    def __getitem__(self, idx: int) -> "Coords2D":
+        return Coords2D(self.__x[idx:idx+1], self.__y[idx:idx+1])
+
