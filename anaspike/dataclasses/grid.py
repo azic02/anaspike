@@ -69,6 +69,10 @@ class RegularGrid1D(Grid1D):
         return cls(points)
 
     @classmethod
+    def from_interval_given_d(cls, interval: Interval, delta: float) -> "RegularGrid1D":
+        return cls.from_interval_given_delta(interval, delta)
+
+    @classmethod
     def from_str(cls, spec: str) -> "RegularGrid1D":
         try:
             parts = spec.split(',')
@@ -90,6 +94,10 @@ class RegularGrid1D(Grid1D):
     @property
     def delta(self) -> float:
         return self.points[1] - self.points[0]
+
+    @property
+    def d(self) -> float:
+        return self.delta
 
 
 class RectilinearGrid2D(HDF5Mixin):
