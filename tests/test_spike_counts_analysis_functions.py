@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.spike_counts import (SpikeCounts,
-                                            get_active_neurons_fraction)
-from anaspike.analysis.spike_trains import SpikeTrains
+from anaspike.spike_counts import (SpikeCounts,
+                                   get_active_neurons_fraction)
+from anaspike.spike_trains import SpikeTrains
 from anaspike.dataclasses.interval import Interval
 from anaspike.dataclasses.coords2d import Coords2D
 

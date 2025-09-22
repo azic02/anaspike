@@ -59,17 +59,17 @@ time_vals = t_bins.labels
 
 # ### spike trains
 
-from anaspike.analysis.spike_trains import SpikeTrains
+from anaspike.spike_trains import SpikeTrains
 spike_trains = SpikeTrains.from_nest(pop, spike_recorder)
 
-from anaspike.analysis.spike_trains import construct_spike_time_histogram
+from anaspike.spike_trains import construct_spike_time_histogram
 spike_time_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_n(t_interval, n=300, endpoint=True))
 spike_time_histogram = construct_spike_time_histogram(spike_trains, spike_time_bins)
 fig, ax = plt.subplots(figsize=(15,3))
 spike_time_histogram.plot(ax)
 plt.show()
 
-from anaspike.analysis.spike_trains import construct_interspike_interval_histogram
+from anaspike.spike_trains import construct_interspike_interval_histogram
 spike_interval_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_n(Interval(0,400), n=100, endpoint=True))
 interspike_interval_histogram = construct_interspike_interval_histogram(spike_trains, spike_interval_bins)
 fig, ax = plt.subplots(figsize=(15,3))
@@ -78,21 +78,21 @@ plt.show()
 
 # ### spike counts
 
-from anaspike.analysis.spike_counts import SpikeCounts
+from anaspike.spike_counts import SpikeCounts
 spike_counts = SpikeCounts.from_spike_trains(spike_trains, Interval(-np.inf, np.inf))
 
-from anaspike.analysis.spike_counts import get_active_neurons_number
+from anaspike.spike_counts import get_active_neurons_number
 active_neurons_number = get_active_neurons_number(spike_counts, thresh=1)
 print(active_neurons_number)
 
-from anaspike.analysis.spike_counts import get_active_neurons_fraction
+from anaspike.spike_counts import get_active_neurons_fraction
 active_neurons_fraction = get_active_neurons_fraction(spike_counts, thresh=1)
 print(active_neurons_fraction)
 
 # ### time averaged firing rate
 
 # +
-from anaspike.analysis.firing_rates import FiringRates
+from anaspike.firing_rates import FiringRates
 firing_ratess = FiringRates.from_spike_trains(spike_trains, t_interval)
 
 fig, ax = plt.subplots()
@@ -103,11 +103,11 @@ fig.colorbar(scat, ax=ax, label='firing rate [Hz]')
 plt.show()
 # -
 
-from anaspike.analysis.firing_rates import mean as tafr_mean
-from anaspike.analysis.firing_rates import std as tafr_std
+from anaspike.firing_rates import mean as tafr_mean
+from anaspike.firing_rates import std as tafr_std
 print(tafr_mean(firing_ratess), tafr_std(firing_ratess))
 
-from anaspike.analysis.firing_rates import construct_histogram
+from anaspike.firing_rates import construct_histogram
 freq_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_n(Interval(0., 5.), n=20, endpoint=True))
 tafr_histogram = construct_histogram(firing_ratess, freq_bins)
 fig, ax = plt.subplots(figsize=(15,3))
@@ -115,7 +115,7 @@ tafr_histogram.plot(ax)
 plt.show()
 
 # +
-from anaspike.analysis.firing_rates import bin_spatially
+from anaspike.firing_rates import bin_spatially
 binned_tafr = bin_spatially(firing_ratess, spatial_bins)
 
 fig, ax = plt.subplots()
@@ -128,7 +128,7 @@ fig.colorbar(pcmesh, ax=ax, label='firing rate [Hz]')
 plt.show()
 
 # +
-from anaspike.analysis.firing_rates import calculate_spatial_psd
+from anaspike.firing_rates import calculate_spatial_psd
 tafr_spatial_psd = calculate_spatial_psd(binned_tafr)
 
 fig, ax = plt.subplots()
@@ -141,7 +141,7 @@ fig.colorbar(pcmesh, ax=ax, label='PSD')
 plt.show()
 
 # +
-from anaspike.analysis.firing_rates import calculate_spatial_autocorrelation_wiener_khinchin
+from anaspike.firing_rates import calculate_spatial_autocorrelation_wiener_khinchin
 spatial_ac_wk = calculate_spatial_autocorrelation_wiener_khinchin(binned_tafr)
 
 fig, ax = plt.subplots()
@@ -157,11 +157,11 @@ plt.show()
 
 # ### instantaneous firing rate
 
-from anaspike.analysis.firing_rates_evolution import FiringRatesEvolution
+from anaspike.firing_rates_evolution import FiringRatesEvolution
 firing_rates_evolution = FiringRatesEvolution.from_spike_trains(spike_trains, t_bins)
 
 # +
-from anaspike.analysis.firing_rates_evolution import temporal_correlation
+from anaspike.firing_rates_evolution import temporal_correlation
 from anaspike.visualization import plot_firing_rate_temporal_correlation
 
 e = 0.02
@@ -178,7 +178,7 @@ plot_firing_rate_temporal_correlation(fig, ax,
                                       t_corr,
                                       cmap='bwr')
 # +
-from anaspike.analysis.firing_rates_evolution import temporal_correlation_matrix
+from anaspike.firing_rates_evolution import temporal_correlation_matrix
 from anaspike.visualization import plot_pairwise_temporal_correlation_matrix
 
 t_corr_mat = temporal_correlation_matrix(firing_rates_evolution)
@@ -186,7 +186,7 @@ t_corr_mat = temporal_correlation_matrix(firing_rates_evolution)
 fig, ax = plt.subplots()
 plot_pairwise_temporal_correlation_matrix(fig, ax, t_corr_mat)
 # +
-from anaspike.analysis.firing_rates_evolution import morans_i_evolution
+from anaspike.firing_rates_evolution import morans_i_evolution
 from anaspike.visualization import plot_morans_i_evolution
 
 morans_i = morans_i_evolution(firing_rates_evolution, pop.coords, decay_power=4)

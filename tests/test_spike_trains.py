@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 
 import numpy as np
 
-from anaspike.analysis.spike_trains import SpikeTrains
+from anaspike.spike_trains import SpikeTrains
 from anaspike.dataclasses.coords2d import Coords2D
 
 

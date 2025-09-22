@@ -2,10 +2,10 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.firing_rates import (FiringRates,
-                                            mean,
-                                            std,
-                                            construct_histogram)
+from anaspike.firing_rates import (FiringRates,
+                                   mean,
+                                   std,
+                                   construct_histogram)
 from anaspike.dataclasses.coords2d import Coords2D
 from anaspike.dataclasses.bins import ContigBins1D
 from anaspike.dataclasses.grid import RegularGrid1D
@@ -132,7 +132,7 @@ class TestBinSpatiallySuccessful(BinSpatiallyTestCase):
                                                [12./3 , np.nan]]).T
                                                
     def test(self):
-        from anaspike.analysis.firing_rates import bin_spatially
+        from anaspike.firing_rates import bin_spatially
         binned_fr = bin_spatially(self.fr, self.bins)
         np.testing.assert_array_almost_equal(binned_fr.elements, self.expected_firing_rates)
 

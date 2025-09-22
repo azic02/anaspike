@@ -3,9 +3,9 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray, DTypeLike
 
-from ...dataclasses.field import Field2D
-from ...dataclasses.coords2d import Coords2D
-from ...dataclasses.interval import Interval
+from ..dataclasses.field import Field2D
+from ..dataclasses.coords2d import Coords2D
+from ..dataclasses.interval import Interval
 from ..spike_trains import SpikeTrains
 
 

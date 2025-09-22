@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.firing_rates_evolution import (FiringRatesEvolution, 
-                                                      temporal_correlation,
-                                                      )
+from anaspike.firing_rates_evolution import (FiringRatesEvolution, 
+                                             temporal_correlation,
+                                             )
 from anaspike.dataclasses.interval import Bin
 
 

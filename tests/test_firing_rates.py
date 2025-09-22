@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.firing_rates import FiringRates
+from anaspike.firing_rates import FiringRates
 
 
 
@@ -29,7 +29,7 @@ class TestFromSpikeTrains(unittest.TestCase):
         self.coords = Coords2D(x=[0.0, 1.0, 2.0], y=[0.0, 1.0, 2.0])
     def test_from_spike_trains(self):
         from anaspike.dataclasses.interval import Interval
-        from anaspike.analysis.spike_trains import SpikeTrains
+        from anaspike.spike_trains import SpikeTrains
 
         spike_trains = SpikeTrains(self.coords, [
             np.array([0.1, 0.2, 0.3], dtype=np.float64),

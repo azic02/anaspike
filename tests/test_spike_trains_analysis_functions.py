@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.spike_trains import SpikeTrains
+from anaspike.spike_trains import SpikeTrains
 from anaspike.dataclasses.bins import ContigBins1D
 from anaspike.dataclasses.grid import Grid1D
 from anaspike.dataclasses.coords2d import Coords2D
@@ -23,7 +23,7 @@ class TestConstructSpikeTimeHistogram(unittest.TestCase):
         self.expected_bin_labels = self.t_bins.labels
 
     def test(self):
-        from anaspike.analysis.spike_trains import construct_spike_time_histogram
+        from anaspike.spike_trains import construct_spike_time_histogram
         result = construct_spike_time_histogram(self.spike_trains, self.t_bins)
         np.testing.assert_array_equal(result.counts, self.expected_counts)
         np.testing.assert_array_almost_equal(result.edges, self.expected_bin_edges)
@@ -44,7 +44,7 @@ class TestConstructInterspikeIntervalHistogram(unittest.TestCase):
         self.expected_bin_labels = self.t_bins.labels
 
     def test(self):
-        from anaspike.analysis.spike_trains import construct_interspike_interval_histogram
+        from anaspike.spike_trains import construct_interspike_interval_histogram
         result = construct_interspike_interval_histogram(self.spike_trains, self.t_bins)
         np.testing.assert_array_equal(result.counts, self.expected_counts)
         np.testing.assert_array_almost_equal(result.edges, self.expected_bin_edges)

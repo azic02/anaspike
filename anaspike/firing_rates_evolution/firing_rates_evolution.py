@@ -1,11 +1,11 @@
 import numpy as np
 from numpy.typing import NDArray
 
-from ...hdf5_mixin import HDF5Mixin
-from ...dataclasses.nest_devices import PopulationData, SpikeRecorderData
-from ...dataclasses.histogram import Histogram
-from ...dataclasses.grid import RegularGrid1D
-from ...dataclasses.bins import ContigBins1D
+from ..hdf5_mixin import HDF5Mixin
+from ..dataclasses.nest_devices import PopulationData, SpikeRecorderData
+from ..dataclasses.histogram import Histogram
+from ..dataclasses.grid import RegularGrid1D
+from ..dataclasses.bins import ContigBins1D
 from ..spike_trains import SpikeTrains
 
 

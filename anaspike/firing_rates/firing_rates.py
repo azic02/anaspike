@@ -3,13 +3,13 @@ from typing import Union, TypeVar
 import numpy as np
 from numpy.typing import NDArray, DTypeLike
 
-from ...hdf5_mixin import HDF5Mixin
+from ..hdf5_mixin import HDF5Mixin
 from ..spike_counts import SpikeCounts
 from ..spike_trains import SpikeTrains
-from ...dataclasses.interval import Interval
-from ...dataclasses.coords2d import Coords2D
-from ...dataclasses.field import Field2D, GridField2D
-from ...dataclasses.grid import RectilinearGrid2D
+from ..dataclasses.interval import Interval
+from ..dataclasses.coords2d import Coords2D
+from ..dataclasses.field import Field2D, GridField2D
+from ..dataclasses.grid import RectilinearGrid2D
 
 
 
