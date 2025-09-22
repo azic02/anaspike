@@ -1,10 +1,10 @@
-from .instantaneous_firing_rate import InstantaneousFiringRates
+from .firing_rates_evolution import FiringRatesEvolution
 from .analysis_functions import (temporal_correlation,
                                  temporal_correlation_matrix,
                                  morans_i_evolution,
                                  )
 
-__all__ = ["InstantaneousFiringRates",
+__all__ = ["FiringRatesEvolution",
            "temporal_correlation",
            "temporal_correlation_matrix",
            "morans_i_evolution",

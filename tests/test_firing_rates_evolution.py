@@ -2,35 +2,35 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.instantaneous_firing_rate import InstantaneousFiringRates
+from anaspike.analysis.firing_rates_evolution import FiringRatesEvolution
 
 
 
-class TestInstantaneousFiringRatesInit(unittest.TestCase):
+class TestFiringRatesEvolutionInit(unittest.TestCase):
     def test_valid_input(self):
         times = np.array([0.0, 1.0, 2.0])
         firing_rates = np.array([[1.0, 2.0, 3.0],
                                  [4.0, 5.0, 6.0]])
-        ifr = InstantaneousFiringRates(times=times, firing_rates=firing_rates)
+        ifr = FiringRatesEvolution(times=times, firing_rates=firing_rates)
         self.assertTrue(np.array_equal(ifr.times, times))
         self.assertTrue(np.array_equal(ifr.along_neuron_dim, firing_rates))
 
     def test_invalid_times_shape(self):
         with self.assertRaises(ValueError):
-            InstantaneousFiringRates(times=np.array([[0.0], [1.0]]), firing_rates=np.array([[1.0]]))
+            FiringRatesEvolution(times=np.array([[0.0], [1.0]]), firing_rates=np.array([[1.0]]))
 
     def test_invalid_firing_rates_shape(self):
         with self.assertRaises(ValueError):
-            InstantaneousFiringRates(times=np.array([0.0]), firing_rates=np.array([1.0]))
+            FiringRatesEvolution(times=np.array([0.0]), firing_rates=np.array([1.0]))
 
     def test_mismatched_dimensions(self):
         with self.assertRaises(ValueError):
-            InstantaneousFiringRates(times=np.array([0.0, 1.0]),
+            FiringRatesEvolution(times=np.array([0.0, 1.0]),
                                      firing_rates=np.array([[1.0],
                                                             [2.0]]))
 
 
-class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
+class TestFiringRatesEvolutionClassMethods(unittest.TestCase):
     def setUp(self):
         from anaspike.dataclasses.bins import ContigBins1D
         from anaspike.dataclasses.grid import RegularGrid1D
@@ -57,7 +57,7 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
                                         [0000., 1000., 2000.],
                                         [1000., 0000., 0000.]]).T
 
-        ifr = InstantaneousFiringRates.from_spike_trains(
+        ifr = FiringRatesEvolution.from_spike_trains(
             spike_trains=spike_trains,
             time_bins=self.time_bins
         )
@@ -82,7 +82,7 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
                                         [0000., 1000., 2000.],
                                         [1000., 0000., 0000.]]).T
 
-        ifr = InstantaneousFiringRates.from_nest(
+        ifr = FiringRatesEvolution.from_nest(
             pop=population_data,
             sr=spike_recorder_data,
             time_bins=self.time_bins
@@ -91,35 +91,35 @@ class TestInstantaneousFiringRatesClassMethods(unittest.TestCase):
         np.testing.assert_array_equal(ifr.along_time_dim, expected_firing_rates)
 
 
-class TestInstantaneousFiringRatesProperties(unittest.TestCase):
+class TestFiringRatesEvolutionProperties(unittest.TestCase):
     def setUp(self):
         self.firing_rates = np.array([[1.0, 2.0, 3.0],
                                       [4.0, 5.0, 6.0],
                                       [7.0, 8.0, 9.0]])
-        self.instantaneous_firing_rates = InstantaneousFiringRates(
+        self.firing_rates_evolutions = FiringRatesEvolution(
             times= np.array([0.0, 1.0, 2.0]),
             firing_rates=np.array(self.firing_rates),
         )
 
     def test_hdf5(self):
         import h5py
-        with h5py.File('test_instantaneous_firing_rates.h5', 'w') as f:
-            self.instantaneous_firing_rates.to_hdf5(f, 'instantaneous_firing_rates')
-        with h5py.File('test_instantaneous_firing_rates.h5', 'r') as f:
-            loaded = InstantaneousFiringRates.from_hdf5(f['instantaneous_firing_rates'])
-        np.testing.assert_array_equal(loaded.along_neuron_dim, self.instantaneous_firing_rates.along_neuron_dim)
-        np.testing.assert_array_equal(loaded.times, self.instantaneous_firing_rates.times)
+        with h5py.File('test_firing_rates_evolutions.h5', 'w') as f:
+            self.firing_rates_evolutions.to_hdf5(f, 'firing_rates_evolutions')
+        with h5py.File('test_firing_rates_evolutions.h5', 'r') as f:
+            loaded = FiringRatesEvolution.from_hdf5(f['firing_rates_evolutions'])
+        np.testing.assert_array_equal(loaded.along_neuron_dim, self.firing_rates_evolutions.along_neuron_dim)
+        np.testing.assert_array_equal(loaded.times, self.firing_rates_evolutions.times)
 
     def test_along_time_dim(self):
         for actual, expected in zip(
-            self.instantaneous_firing_rates.along_time_dim,
+            self.firing_rates_evolutions.along_time_dim,
             self.firing_rates.T
         ):
             np.testing.assert_array_equal(actual, expected)
 
     def test_along_neuron_dim(self):
         for actual, expected in zip(
-            self.instantaneous_firing_rates.along_neuron_dim,
+            self.firing_rates_evolutions.along_neuron_dim,
             self.firing_rates
         ):
             np.testing.assert_array_equal(actual, expected)

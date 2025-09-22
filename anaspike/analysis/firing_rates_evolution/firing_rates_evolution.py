@@ -10,7 +10,7 @@ from ..spike_trains import SpikeTrains
 
 
 
-class InstantaneousFiringRates(HDF5Mixin):
+class FiringRatesEvolution(HDF5Mixin):
     def __init__(self, times: NDArray[np.float64], firing_rates: NDArray[np.float64]):
         if times.ndim != 1:
             raise ValueError("`times` must be a 1D array.")
@@ -24,7 +24,7 @@ class InstantaneousFiringRates(HDF5Mixin):
 
     @classmethod
     def from_spike_trains(cls, spike_trains: SpikeTrains,
-                          time_bins: ContigBins1D[RegularGrid1D]) -> "InstantaneousFiringRates":
+                          time_bins: ContigBins1D[RegularGrid1D]) -> "FiringRatesEvolution":
         spike_counts = np.array([Histogram.construct_by_counting(bins=time_bins, data=st).counts for st in spike_trains])
         return cls(
             times=time_bins.labels,
@@ -33,7 +33,7 @@ class InstantaneousFiringRates(HDF5Mixin):
 
     @classmethod
     def from_nest(cls, pop: PopulationData, sr: SpikeRecorderData,
-                  time_bins: ContigBins1D[RegularGrid1D]) -> "InstantaneousFiringRates":
+                  time_bins: ContigBins1D[RegularGrid1D]) -> "FiringRatesEvolution":
         spike_trains = SpikeTrains.from_nest(pop=pop, sr=sr)
         return cls.from_spike_trains(spike_trains=spike_trains, time_bins=time_bins)
 

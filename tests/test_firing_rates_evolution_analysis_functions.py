@@ -2,9 +2,9 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.instantaneous_firing_rate import (InstantaneousFiringRates, 
-                                                         temporal_correlation,
-                                                         )
+from anaspike.analysis.firing_rates_evolution import (FiringRatesEvolution, 
+                                                      temporal_correlation,
+                                                      )
 from anaspike.dataclasses.interval import Bin
 
 
@@ -16,7 +16,7 @@ class TemporalCorrelationTestCase(unittest.TestCase):
 
         cls.times = np.array([t_bin.label for t_bin in cls.t_bins])
 
-        cls.instantaneous_firing_rates = InstantaneousFiringRates(
+        cls.firing_rates_evolutions = FiringRatesEvolution(
             times=cls.times,
             firing_rates=np.array([[2000.0, 0000.0, 0000.0],
                                    [0000.0, 1000.0, 2000.0],
@@ -29,14 +29,14 @@ class TestTemporalCorrelationNonMatchingTimeDim(TemporalCorrelationTestCase):
         self.ref_firing_rate = np.array([0., 1., 2., 3.])
     def test(self):
         with self.assertRaises(ValueError):
-            temporal_correlation(self.instantaneous_firing_rates, self.ref_firing_rate)
+            temporal_correlation(self.firing_rates_evolutions, self.ref_firing_rate)
 
 class TestTemporalCorrelationInvalidReferenceShape(TemporalCorrelationTestCase):
     def setUp(self):
         self.ref_firing_rate = np.array([[0., 1.], [2., 3.]])
     def test(self):
         with self.assertRaises(ValueError):
-            temporal_correlation(self.instantaneous_firing_rates, self.ref_firing_rate)
+            temporal_correlation(self.firing_rates_evolutions, self.ref_firing_rate)
 
 
 if __name__ == "__main__":
