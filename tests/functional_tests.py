@@ -126,6 +126,33 @@ ax.set_xlabel('cortical space [mm]')
 ax.set_ylabel('cortical space [mm]')
 fig.colorbar(pcmesh, ax=ax, label='firing rate [Hz]')
 plt.show()
+
+# +
+from anaspike.analysis.time_averaged_firing_rate import calculate_spatial_psd
+tafr_spatial_psd = calculate_spatial_psd(binned_tafr)
+
+fig, ax = plt.subplots()
+pcmesh = ax.pcolormesh(tafr_spatial_psd.xx, tafr_spatial_psd.yy, tafr_spatial_psd.elements,
+             vmin=0.,
+             cmap='Greys')
+ax.set_xlabel('freq [1/mm]')
+ax.set_ylabel('freq [1/mm]')
+fig.colorbar(pcmesh, ax=ax, label='PSD')
+plt.show()
+
+# +
+from anaspike.analysis.time_averaged_firing_rate import calculate_spatial_autocorrelation_wiener_khinchin
+spatial_ac_wk = calculate_spatial_autocorrelation_wiener_khinchin(binned_tafr)
+
+fig, ax = plt.subplots()
+pcmesh = ax.pcolormesh(spatial_ac_wk.xx, spatial_ac_wk.yy, spatial_ac_wk.elements,
+                       vmin=-1.,
+                       vmax=1.0,
+                       cmap='bwr')
+ax.set_xlabel('offset [mm]')
+ax.set_ylabel('offset [mm]')
+fig.colorbar(pcmesh, ax=ax, label='spatial autocorrelation (wiener-khinchin)')
+plt.show()
 # -
 
 # ### instantaneous firing rate

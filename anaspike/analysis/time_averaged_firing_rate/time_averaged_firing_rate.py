@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray, DTypeLike
@@ -8,7 +8,8 @@ from ..spike_counts import SpikeCounts
 from ..spike_trains import SpikeTrains
 from ...dataclasses.interval import Interval
 from ...dataclasses.coords2d import Coords2D
-from ...dataclasses.field import Field2D
+from ...dataclasses.field import Field2D, GridField2D
+from ...dataclasses.grid import RectilinearGrid2D
 
 
 
@@ -39,4 +40,6 @@ class TimeAveragedFiringRate(Field2D[np.float64], HDF5Mixin):
         return self.firing_rates.shape
 
 
+Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)
+BinnedTimeAveragedFiringRate = GridField2D[Grid2dT, np.float64]
 

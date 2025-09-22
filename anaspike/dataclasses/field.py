@@ -45,8 +45,8 @@ class GridField2D(Generic[GridT, SigT]):
     def __init__(self, grid: GridT, elements: NDArray[SigT]):
         if elements.ndim < 2:
             raise ValueError("elements must be at least a two-dimensional array.")
-        if grid.N != elements.shape[0] * elements.shape[1]:
-            raise ValueError("number of points in coordinate grid (`grid.N`) must match the number of elements in `elements`.")
+        if grid.shape != elements.shape[:2]:
+            raise ValueError(f"shape of grid {grid.shape} must match first two dimensions of elements {elements.shape[:2]}.")
         
         self.__grid = grid
         self.__elements = elements
@@ -79,14 +79,43 @@ class GridField2D(Generic[GridT, SigT]):
     def yy(self) -> NDArray[np.float64]:
         return self.grid.yy
 
+    def ravel_index(self, ix: np.intp, iy: np.intp):
+        return np.ravel_multi_index((ix, iy), self.grid.shape)
 
-def calculate_psd_2d(elements: GridField2D[RegularGrid2D,np.float64]) -> GridField2D[RegularGrid2D,np.float64]:
-    freq_x = np.fft.fftshift(np.fft.fftfreq(elements.nx, d=elements.grid.delta_x)).astype(np.float64)
-    freq_y = np.fft.fftshift(np.fft.fftfreq(elements.ny, d=elements.grid.delta_y)).astype(np.float64)
+    def unravel_index(self, i: np.intp):
+        return np.unravel_index(i, self.grid.shape)
+
+
+def calculate_fft_2d(gf: GridField2D[RegularGrid2D,SigT]):
+    freq_x = np.fft.fftshift(np.fft.fftfreq(gf.nx, d=gf.grid.delta_x)).astype(np.float64)
+    freq_y = np.fft.fftshift(np.fft.fftfreq(gf.ny, d=gf.grid.delta_y)).astype(np.float64)
     grid = RegularGrid2D(x=RegularGrid1D(freq_x), y=RegularGrid1D(freq_y))
+    fft_elements = np.fft.fftshift(np.fft.fft2(gf.elements))
+    return GridField2D(grid, fft_elements)
 
-    Z_fft = np.fft.fft2(elements.elements)
-    Z_shifted = np.fft.fftshift(Z_fft)
-    psd = np.abs(Z_shifted)**2 / (elements.nx**2 * elements.ny**2)  # Normalized power
-    return GridField2D(grid, psd)
+
+def calculate_ifft_2d(gf: GridField2D[RegularGrid2D,SigT]):
+    spatial_x = np.fft.fftshift(np.fft.fftfreq(gf.nx, d=gf.grid.delta_x))
+    spatial_y = np.fft.fftshift(np.fft.fftfreq(gf.ny, d=gf.grid.delta_y))
+    grid = RegularGrid2D(
+        x=RegularGrid1D(spatial_x.astype(np.float64)),
+        y=RegularGrid1D(spatial_y.astype(np.float64))
+    )
+    
+    ifft_data = np.fft.ifft2(np.fft.ifftshift(gf.elements))
+    return GridField2D(grid, ifft_data)
+
+
+def calculate_psd_2d(gf: GridField2D[RegularGrid2D,SigT]) -> GridField2D[RegularGrid2D,np.float64]:
+    fft = calculate_fft_2d(gf)
+    psd_elements = np.abs(fft.elements) ** 2
+    return GridField2D(fft.grid, psd_elements)
+
+
+def calculate_autocorrelation_2d_wiener_khinchin(gf: GridField2D[RegularGrid2D,SigT]) -> GridField2D[RegularGrid2D,np.float64]:
+    psd = calculate_psd_2d(gf)
+    unshifted_ac = calculate_ifft_2d(psd)
+    ac_at_zero_lag = unshifted_ac.elements[0,0].real
+    normalised_ac = GridField2D(unshifted_ac.grid, np.fft.fftshift(unshifted_ac.elements.real) / ac_at_zero_lag)
+    return normalised_ac
 
