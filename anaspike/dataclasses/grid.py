@@ -1,4 +1,4 @@
-from typing import Union, overload
+from typing import Union, overload, Tuple
 
 import numpy as np
 from numpy.typing import NDArray
@@ -136,6 +136,10 @@ class RectilinearGrid2D(HDF5Mixin):
     @property
     def N(self) -> int:
         return self.nx * self.ny
+
+    @property
+    def shape(self) -> Tuple[int, int]:
+        return (self.nx, self.ny)
 
 
 Grid2D = RectilinearGrid2D
