@@ -13,7 +13,7 @@ from ...dataclasses.grid import RectilinearGrid2D
 
 
 
-class TimeAveragedFiringRate(Field2D[np.float64], HDF5Mixin):
+class FiringRates(Field2D[np.float64], HDF5Mixin):
     def __init__(self, coords: Coords2D, firing_rates: NDArray[np.float64]):
         if firing_rates.ndim != 1:
             raise ValueError("firing_rates must be a 1D array")
@@ -41,5 +41,5 @@ class TimeAveragedFiringRate(Field2D[np.float64], HDF5Mixin):
 
 
 Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)
-BinnedTimeAveragedFiringRate = GridField2D[Grid2dT, np.float64]
+BinnedFiringRates = GridField2D[Grid2dT, np.float64]
 

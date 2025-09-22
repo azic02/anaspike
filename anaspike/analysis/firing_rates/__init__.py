@@ -1,6 +1,6 @@
-from .time_averaged_firing_rate import (TimeAveragedFiringRate,
-                                        BinnedTimeAveragedFiringRate,
-                                        )
+from .firing_rates import (FiringRates,
+                           BinnedFiringRates,
+                           )
 from .analysis_functions import (mean,
                                  std,
                                  construct_histogram,
@@ -9,8 +9,8 @@ from .analysis_functions import (mean,
                                  calculate_spatial_autocorrelation_wiener_khinchin,
                                  )
 
-__all__ = ["TimeAveragedFiringRate",
-           "BinnedTimeAveragedFiringRate",
+__all__ = ["FiringRates",
+           "BinnedFiringRates",
            "mean",
            "std",
            "construct_histogram",

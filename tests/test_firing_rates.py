@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.time_averaged_firing_rate import TimeAveragedFiringRate
+from anaspike.analysis.firing_rates import FiringRates
 
 
 
@@ -11,13 +11,13 @@ class TestInit(unittest.TestCase):
         from anaspike.dataclasses.coords2d import Coords2D
         self.coords = Coords2D(x=[0.0, 1.0, 2.0], y=[0.0, 1.0, 2.0])
     def test_valid_init(self):
-        fr = TimeAveragedFiringRate(self.coords, firing_rates=np.array([0.0, 1.0, 2.0]))
-        self.assertIsInstance(fr, TimeAveragedFiringRate)
+        fr = FiringRates(self.coords, firing_rates=np.array([0.0, 1.0, 2.0]))
+        self.assertIsInstance(fr, FiringRates)
         np.testing.assert_array_almost_equal(fr, np.array([0.0, 1.0, 2.0]))
 
     def test_invalid_dimensions(self):
         with self.assertRaises(ValueError):
-            TimeAveragedFiringRate(self.coords,
+            FiringRates(self.coords,
                                    firing_rates=np.array([[0.0, 1.0],
                                                           [2.0, 3.0]]))
 
@@ -39,7 +39,7 @@ class TestFromSpikeTrains(unittest.TestCase):
 
         interval = Interval(0.15, 0.45)
 
-        fr = TimeAveragedFiringRate.from_spike_trains(
+        fr = FiringRates.from_spike_trains(
             spike_trains=spike_trains,
             time_window=interval,
             time_unit=1.e-3
@@ -54,16 +54,16 @@ class TestHdf5Conversion(unittest.TestCase):
         from pathlib import Path
         from anaspike.dataclasses.coords2d import Coords2D
         self.file_path = Path('test_ta_fr.h5')
-        self.fr = TimeAveragedFiringRate(
+        self.fr = FiringRates(
                 coords=Coords2D(x=[0.0, 1.0, 2.0], y=[0.0, 1.0, 2.0]),
                 firing_rates=np.array([0.0, 1.0, 2.0]))
 
     def test_to_hdf5_and_from_hdf5(self):
         import h5py
         with h5py.File(self.file_path, 'w') as f_out:
-            self.fr.to_hdf5(f_out, 'time_averaged_firing_rate')
+            self.fr.to_hdf5(f_out, 'firing_rates')
         with h5py.File(self.file_path, 'r') as f_in:
-            fr_loaded = TimeAveragedFiringRate.from_hdf5(f_in['time_averaged_firing_rate'])
+            fr_loaded = FiringRates.from_hdf5(f_in['firing_rates'])
         np.testing.assert_array_almost_equal(fr_loaded, self.fr)
         np.testing.assert_array_almost_equal(fr_loaded.coords.x, self.fr.coords.x)
         np.testing.assert_array_almost_equal(fr_loaded.coords.y, self.fr.coords.y)

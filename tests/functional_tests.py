@@ -92,31 +92,31 @@ print(active_neurons_fraction)
 # ### time averaged firing rate
 
 # +
-from anaspike.analysis.time_averaged_firing_rate import TimeAveragedFiringRate
-time_averaged_firing_rates = TimeAveragedFiringRate.from_spike_trains(spike_trains, t_interval)
+from anaspike.analysis.firing_rates import FiringRates
+firing_ratess = FiringRates.from_spike_trains(spike_trains, t_interval)
 
 fig, ax = plt.subplots()
-scat = ax.scatter(x=pop.coords.x, y=pop.coords.y, c=time_averaged_firing_rates, vmin=0., cmap='Greys', s=10)
+scat = ax.scatter(x=pop.coords.x, y=pop.coords.y, c=firing_ratess, vmin=0., cmap='Greys', s=10)
 ax.set_xlabel('cortical space [mm]')
 ax.set_ylabel('cortical space [mm]')
 fig.colorbar(scat, ax=ax, label='firing rate [Hz]')
 plt.show()
 # -
 
-from anaspike.analysis.time_averaged_firing_rate import mean as tafr_mean
-from anaspike.analysis.time_averaged_firing_rate import std as tafr_std
-print(tafr_mean(time_averaged_firing_rates), tafr_std(time_averaged_firing_rates))
+from anaspike.analysis.firing_rates import mean as tafr_mean
+from anaspike.analysis.firing_rates import std as tafr_std
+print(tafr_mean(firing_ratess), tafr_std(firing_ratess))
 
-from anaspike.analysis.time_averaged_firing_rate import construct_histogram
+from anaspike.analysis.firing_rates import construct_histogram
 freq_bins = ContigBins1D.with_median_labels(RegularGrid1D.from_interval_given_n(Interval(0., 5.), n=20, endpoint=True))
-tafr_histogram = construct_histogram(time_averaged_firing_rates, freq_bins)
+tafr_histogram = construct_histogram(firing_ratess, freq_bins)
 fig, ax = plt.subplots(figsize=(15,3))
 tafr_histogram.plot(ax)
 plt.show()
 
 # +
-from anaspike.analysis.time_averaged_firing_rate import bin_spatially
-binned_tafr = bin_spatially(time_averaged_firing_rates, spatial_bins)
+from anaspike.analysis.firing_rates import bin_spatially
+binned_tafr = bin_spatially(firing_ratess, spatial_bins)
 
 fig, ax = plt.subplots()
 pcmesh = ax.pcolormesh(binned_tafr.xx, binned_tafr.yy, binned_tafr.elements,
@@ -128,7 +128,7 @@ fig.colorbar(pcmesh, ax=ax, label='firing rate [Hz]')
 plt.show()
 
 # +
-from anaspike.analysis.time_averaged_firing_rate import calculate_spatial_psd
+from anaspike.analysis.firing_rates import calculate_spatial_psd
 tafr_spatial_psd = calculate_spatial_psd(binned_tafr)
 
 fig, ax = plt.subplots()
@@ -141,7 +141,7 @@ fig.colorbar(pcmesh, ax=ax, label='PSD')
 plt.show()
 
 # +
-from anaspike.analysis.time_averaged_firing_rate import calculate_spatial_autocorrelation_wiener_khinchin
+from anaspike.analysis.firing_rates import calculate_spatial_autocorrelation_wiener_khinchin
 spatial_ac_wk = calculate_spatial_autocorrelation_wiener_khinchin(binned_tafr)
 
 fig, ax = plt.subplots()

@@ -2,10 +2,10 @@ import unittest
 
 import numpy as np
 
-from anaspike.analysis.time_averaged_firing_rate import (TimeAveragedFiringRate,
-                                                         mean,
-                                                         std,
-                                                         construct_histogram)
+from anaspike.analysis.firing_rates import (FiringRates,
+                                            mean,
+                                            std,
+                                            construct_histogram)
 from anaspike.dataclasses.coords2d import Coords2D
 from anaspike.dataclasses.bins import ContigBins1D
 from anaspike.dataclasses.grid import RegularGrid1D
@@ -15,7 +15,7 @@ from anaspike.dataclasses.interval import Interval
 
 class TestMean(unittest.TestCase):
     def test_constant_fr(self):
-        fr = TimeAveragedFiringRate(Coords2D(np.arange(10), np.arange(10)),
+        fr = FiringRates(Coords2D(np.arange(10), np.arange(10)),
                                     np.ones(10))
         expected_result = 1
         self.assertAlmostEqual(expected_result, mean(fr))
@@ -24,7 +24,7 @@ class TestMean(unittest.TestCase):
         start = 0.
         stop = 10.
         n = 10
-        fr = TimeAveragedFiringRate(Coords2D(np.arange(n), np.arange(n)),
+        fr = FiringRates(Coords2D(np.arange(n), np.arange(n)),
                                     np.linspace(start, stop, n, dtype=np.float64))
         expected_result = (start + stop) / 2
         self.assertAlmostEqual(expected_result, mean(fr))
@@ -33,7 +33,7 @@ class TestMean(unittest.TestCase):
 class TestStd(unittest.TestCase):
     def test_constant_fr(self):
         n = 10
-        fr = TimeAveragedFiringRate(Coords2D(np.arange(n), np.arange(n)),
+        fr = FiringRates(Coords2D(np.arange(n), np.arange(n)),
                                     np.ones(n))
         expected_result = 0
         self.assertAlmostEqual(expected_result, std(fr))
@@ -42,7 +42,7 @@ class TestStd(unittest.TestCase):
         start = 0.
         stop = 10.
         n = 10
-        fr = TimeAveragedFiringRate(Coords2D(np.arange(n), np.arange(n)),
+        fr = FiringRates(Coords2D(np.arange(n), np.arange(n)),
                                     np.linspace(start, stop, n, dtype=np.float64))
         step_size = (stop - start) / (n - 1)
         expected_result = step_size * np.sqrt((n**2 - 1) / 12)
@@ -52,7 +52,7 @@ class TestStd(unittest.TestCase):
 class TestHistogramConstantFiringRate(unittest.TestCase):
     def setUp(self):
         n = 10
-        self.fr = TimeAveragedFiringRate(Coords2D(np.arange(n), np.arange(n)),
+        self.fr = FiringRates(Coords2D(np.arange(n), np.arange(n)),
                                          np.ones(n))
         self.interval = Interval(0, 2)
         self.n_bins = 2
@@ -75,7 +75,7 @@ class TestHistogramAscendingFiringRate(unittest.TestCase):
         self.start = 0.
         self.stop = 10.
         self.n_fr = 10
-        self.fr = TimeAveragedFiringRate(Coords2D(np.arange(self.n_fr),
+        self.fr = FiringRates(Coords2D(np.arange(self.n_fr),
                                                   np.arange(self.n_fr)),
                                          np.linspace(self.start, self.stop, self.n_fr, dtype=np.float64))
 
@@ -116,7 +116,7 @@ class TestBinSpatiallySuccessful(BinSpatiallyTestCase):
         from anaspike.dataclasses.bins import ContigBins2D
         from anaspike.dataclasses.grid import RegularGrid2D, RegularGrid1D
         from anaspike.dataclasses.interval import Interval
-        self.fr = TimeAveragedFiringRate(
+        self.fr = FiringRates(
                 self.Coords2D(x=np.array([0.1, 0.4, 0.6, 0.8, 0.2, 0.3, 0.5]),
                               y=np.array([1.5, 0.7, 0.2, 0.9, 1.9, 1.4, 0.8])),
                 np.array([1, 2, 3, 4, 5, 6, 7]))
@@ -132,7 +132,7 @@ class TestBinSpatiallySuccessful(BinSpatiallyTestCase):
                                                [12./3 , np.nan]]).T
                                                
     def test(self):
-        from anaspike.analysis.time_averaged_firing_rate import bin_spatially
+        from anaspike.analysis.firing_rates import bin_spatially
         binned_fr = bin_spatially(self.fr, self.bins)
         np.testing.assert_array_almost_equal(binned_fr.elements, self.expected_firing_rates)
 
