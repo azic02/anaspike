@@ -2,6 +2,56 @@ import unittest
 
 import numpy as np
 
+from anaspike.dataclasses.bins import ContigBins1D
+
+
+
+class TestContigBins1dFromString(unittest.TestCase):
+    def test_too_many_parts(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1,n10,extra")
+
+    def test_too_few_parts(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1")
+
+    def test_n_not_integer(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1,n10.5")
+
+    def test_no_char(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1,10")
+
+    def test_invalid_char(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1,x10")
+
+    def test_n_zero(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1,n0")
+
+    def test_n_negative(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1,n-5")
+
+    def test_d_negative(self):
+        with self.assertRaises(ValueError):
+            ContigBins1D.from_str("0,1,d-0.1")
+
+    def test_valid_n(self):
+        bins = ContigBins1D.from_str("0,1,n4")
+        expected_edges = np.array([0., 0.25, 0.5, 0.75, 1.])
+        expected_labels = np.array([0.125, 0.375, 0.625, 0.875])
+        np.testing.assert_array_almost_equal(bins.edges, expected_edges)
+        np.testing.assert_array_almost_equal(bins.labels, expected_labels)
+
+    def test_valid_d(self):
+        bins = ContigBins1D.from_str("0,1,d0.3")
+        expected_edges = np.array([0., 0.3, 0.6, 0.9])
+        expected_labels = np.array([0.15, 0.45, 0.75])
+        np.testing.assert_array_almost_equal(bins.edges, expected_edges)
+        np.testing.assert_array_almost_equal(bins.labels, expected_labels)
 
 
 class TestContigBins2dCreation(unittest.TestCase):

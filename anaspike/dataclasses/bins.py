@@ -4,7 +4,8 @@ import numpy as np
 from numpy.typing import NDArray
 
 from ..hdf5_mixin import HDF5Mixin
-from .grid import Grid1D, RectilinearGrid2D
+from .grid import Grid1D, RegularGrid1D, RectilinearGrid2D
+from .interval import Interval
 from .coords2d import Coords2D
 from .field import Field2D, GridField2D
 from .interval import Bin
@@ -21,11 +22,33 @@ class ContigBins1D(Generic[Grid1dT], HDF5Mixin):
         self.__grid = grid
         self.__labels = labels
 
-
     @classmethod
     def with_median_labels(cls, grid: Grid1dT):
         labels = grid[:-1] + np.diff(grid) / 2
         return cls(grid, labels)
+
+    @classmethod
+    def from_str(cls, spec: str) -> "ContigBins1D[RegularGrid1D]":
+        try:
+            parts = spec.split(',')
+            if len(parts) != 3:
+                raise ValueError("Specification string must have three parts separated by commas.")
+            start = float(parts[0])
+            end = float(parts[1])
+            if parts[2].startswith('n'):
+                n = int(parts[2][1:])
+                return ContigBins1D[RegularGrid1D].with_median_labels(
+                        RegularGrid1D.from_interval_given_n(Interval(start, end),
+                                                            n + 1,
+                                                            endpoint=True))
+            elif parts[2].startswith('d'):
+                delta = float(parts[2][1:])
+                return ContigBins1D[RegularGrid1D].with_median_labels(
+                        RegularGrid1D.from_interval_given_delta(Interval(start, end), delta))
+            else:
+                raise ValueError("Third part of specification must start with 'n' or 'd'.")
+        except Exception as e:
+            raise ValueError(f"Invalid specification string: {spec}. Interval string must be in the format '<start>,<end>,n<n_bins>' or '<start>,<end>,d<delta>'") from e
 
     @property
     def labels(self) -> NDArray[np.float64]:
