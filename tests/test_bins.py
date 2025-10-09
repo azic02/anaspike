@@ -160,16 +160,16 @@ class TestCalculateBinCounts(TestClassSetup):
 class TestCalculateBinSums(TestClassSetup):
     def test_coords_outside_bins(self):
         from anaspike.dataclasses.bins import calculate_bin_sums_2d
-        from anaspike.dataclasses.field import Field2D
-        field = Field2D(self.coords_outside_bins,
+        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
+        field = CartesianMap2D(self.coords_outside_bins,
                         np.array(np.arange(4) + 1, dtype=np.float64))
         with self.assertRaises(ValueError):
             calculate_bin_sums_2d(self.bins, field)
 
     def test_calculate_bin_sums_2d_scalar_field(self):
         from anaspike.dataclasses.bins import calculate_bin_sums_2d
-        from anaspike.dataclasses.field import Field2D
-        field = Field2D(self.coords,
+        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
+        field = CartesianMap2D(self.coords,
                       np.array(np.arange(4) + 1, dtype=np.float64))
         expected_sums = np.array([[1, 6],
                                   [0, 0],
@@ -179,8 +179,8 @@ class TestCalculateBinSums(TestClassSetup):
 
     def test_calculate_bin_sums_2d_vector_field_2d(self):
         from anaspike.dataclasses.bins import calculate_bin_sums_2d
-        from anaspike.dataclasses.field import Field2D
-        field = Field2D(self.coords,
+        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
+        field = CartesianMap2D(self.coords,
                         np.array([[1, 2],
                                   [3, 4],
                                   [5, 6],
@@ -195,16 +195,16 @@ class TestCalculateBinSums(TestClassSetup):
 class TestCalculateBinMeans(TestClassSetup):
     def test_coords_outside_bins(self):
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        from anaspike.dataclasses.field import Field2D
-        field = Field2D(self.coords_outside_bins,
+        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
+        field = CartesianMap2D(self.coords_outside_bins,
                         np.array(np.arange(4) + 1, dtype=np.float64))
         with self.assertRaises(ValueError):
             calculate_bin_means_2d(self.bins, field)
 
     def test_calculate_bin_means_2d_sclar_field(self):
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        from anaspike.dataclasses.field import Field2D
-        field = Field2D(self.coords,
+        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
+        field = CartesianMap2D(self.coords,
                         np.array(np.arange(4) + 1, dtype=np.float64))
         expected_means = np.array([[1 / 1, 6 / 2],
                                    [np.nan, np.nan],
@@ -214,8 +214,8 @@ class TestCalculateBinMeans(TestClassSetup):
 
     def test_calculate_bin_means_2d_vector_field_2d(self):
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        from anaspike.dataclasses.field import Field2D
-        field = Field2D(self.coords,
+        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
+        field = CartesianMap2D(self.coords,
                         np.array([[1, 2],
                                   [3, 4],
                                   [5, 6],
@@ -231,10 +231,10 @@ class TestCalculateBinMeans(TestClassSetup):
         from anaspike.dataclasses.bins import ContigBins2D
         from anaspike.dataclasses.grid import RegularGrid2D, RegularGrid1D
         from anaspike.dataclasses.interval import Interval
-        from anaspike.dataclasses.field import Field2D
+        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
         from anaspike.dataclasses.coords2d import Coords2D
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        field = Field2D(
+        field = CartesianMap2D(
                 Coords2D(x=np.array([0.1, 0.4, 0.6, 0.8, 0.2, 0.3, 0.5]),
                          y=np.array([1.5, 0.7, 0.2, 0.9, 1.9, 1.4, 0.8])),
                 np.array([1, 2, 3, 4, 5, 6, 7]))

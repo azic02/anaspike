@@ -7,10 +7,8 @@ from ..dataclasses.histogram import Histogram
 from ..dataclasses.bins import ContigBins1D
 from ..dataclasses.bins import ContigBins2D
 from ..dataclasses.bins import calculate_bin_means_2d
-from ..dataclasses.grid import Grid1D, RegularGrid1D, RectilinearGrid2D, RegularGrid2D
-from ..dataclasses.field import calculate_psd_2d, calculate_autocorrelation_2d_wiener_khinchin
-from ..functions._helpers import construct_offsets, construct_offset_vectors
-from ..functions.statistical_quantities import pearson_correlation_offset_data
+from ..dataclasses.grid import Grid1D, RectilinearGrid2D, RegularGrid2D
+from ..dataclasses.grid_map_2d import calculate_psd_2d, calculate_autocorrelation_2d_wiener_khinchin
 
 
 

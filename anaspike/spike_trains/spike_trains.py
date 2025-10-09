@@ -3,7 +3,7 @@ from typing import overload, Union, Collection
 import numpy as np
 from numpy.typing import NDArray, DTypeLike
 
-from anaspike.dataclasses.field import Field2D
+from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
 from anaspike.hdf5_mixin import HDF5Mixin
 from anaspike.dataclasses.coords2d import Coords2D
 from anaspike.dataclasses.nest_devices import SpikeRecorderData, PopulationData
@@ -12,7 +12,7 @@ from anaspike.dataclasses.nest_devices import SpikeRecorderData, PopulationData
 
 SpikeTrain = NDArray[np.float64]
 
-class SpikeTrains(Field2D[np.object_], HDF5Mixin):
+class SpikeTrains(CartesianMap2D[np.object_], HDF5Mixin):
     def __init__(self, coords: Coords2D, spike_trains: Collection[SpikeTrain]):
         spike_trains = np.asarray(spike_trains, dtype=object)
         super().__init__(coords, spike_trains)

@@ -4,16 +4,16 @@ import numpy as np
 
 from anaspike.dataclasses.interval import Interval
 from anaspike.dataclasses.grid import RegularGrid1D, RegularGrid2D
-from anaspike.dataclasses.field import (GridField2D,
-                                        calculate_fft_2d,
-                                        calculate_ifft_2d,
-                                        calculate_psd_2d,
-                                        calculate_autocorrelation_2d_wiener_khinchin,
-                                        )
+from anaspike.dataclasses.grid_map_2d import (GridMap2D,
+                                              calculate_fft_2d,
+                                              calculate_ifft_2d,
+                                              calculate_psd_2d,
+                                              calculate_autocorrelation_2d_wiener_khinchin,
+                                              )
 
 
 
-class TestGridField2DConstruction(unittest.TestCase):
+class TestGridMap2DConstruction(unittest.TestCase):
     def test_incompatible_number_of_values(self):
         nx = 3
         ny = 4
@@ -22,7 +22,7 @@ class TestGridField2DConstruction(unittest.TestCase):
         grid = RegularGrid2D(RegularGrid1D(x_coords), RegularGrid1D(y_coords))
         values = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
         with self.assertRaises(ValueError):
-            GridField2D(grid, values)
+            GridMap2D(grid, values)
 
     def test_incompatible_value_array_shape(self):
         nx = 3
@@ -35,9 +35,9 @@ class TestGridField2DConstruction(unittest.TestCase):
                            [8, 9, 10],
                            [12, 13, 14]])
         with self.assertRaises(ValueError):
-            GridField2D(grid, values)
+            GridMap2D(grid, values)
 
-class TestGridField2DCorrectCoords(unittest.TestCase):
+class TestGridMap2DCorrectCoords(unittest.TestCase):
     def setUp(self):
         self.nx = 3
         self.ny = 4
@@ -47,7 +47,7 @@ class TestGridField2DCorrectCoords(unittest.TestCase):
         self.values = np.array([[0, 1, 2, 3],
                                 [4, 5, 6, 7],
                                 [8, 9, 10, 11]])
-        self.gf = GridField2D(grid, self.values)
+        self.gf = GridMap2D(grid, self.values)
 
     def test(self):
         for i in range(self.nx):
@@ -64,7 +64,7 @@ class TestFFT(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         fft_gf = calculate_fft_2d(gf)
         self.assertEqual(fft_gf.elements.shape, (nx, ny))
         self.assertEqual(fft_gf.grid.shape, (nx, ny))
@@ -76,7 +76,7 @@ class TestFFT(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         fft_gf = calculate_fft_2d(gf)
         center_idx = (fft_gf.nx // 2, fft_gf.ny // 2)
         self.assertAlmostEqual(0.0, fft_gf.xx[center_idx])
@@ -90,7 +90,7 @@ class TestIFFT(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         fft = calculate_fft_2d(gf)
         ifft = calculate_ifft_2d(fft)
         self.assertEqual(ifft.elements.shape, (nx, ny))
@@ -103,7 +103,7 @@ class TestIFFT(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         fft = calculate_fft_2d(gf)
         ifft = calculate_ifft_2d(fft)
         center_idx = (ifft.nx // 2, ifft.ny // 2)
@@ -120,7 +120,7 @@ class TestIFFT(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(-0.25, 0.25),
                                                     1000,
                                                     endpoint=False))
-        signal = GridField2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
+        signal = GridMap2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
         fft = calculate_fft_2d(signal)
         ifft = calculate_ifft_2d(fft)
         np.testing.assert_array_almost_equal(ifft.xx, signal.xx)
@@ -136,7 +136,7 @@ class TestPSD(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         psd = calculate_psd_2d(gf)
         self.assertEqual(psd.elements.shape, (nx, ny))
         self.assertEqual(psd.grid.shape, (nx, ny))
@@ -148,7 +148,7 @@ class TestPSD(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.ones((nx, ny))
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         psd = calculate_psd_2d(gf)
         peak_idx = gf.unravel_index(np.argmax(psd.elements))
         self.assertEqual((nx // 2, ny // 2), peak_idx)
@@ -165,7 +165,7 @@ class TestPSD(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(-1, 2),
                                                     1000,
                                                     endpoint=False))
-        gf = GridField2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
+        gf = GridMap2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
         psd = calculate_psd_2d(gf)
         peak_indices = gf.unravel_index(np.argmax(psd.elements))
         peak_x_frequency = psd.xx[peak_indices]
@@ -182,8 +182,8 @@ class TestAutocorrelation(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
-        from anaspike.dataclasses.field import calculate_autocorrelation_2d_wiener_khinchin
+        gf = GridMap2D(grid, values)
+        from anaspike.dataclasses.grid_map_2d import calculate_autocorrelation_2d_wiener_khinchin
         ac = calculate_autocorrelation_2d_wiener_khinchin(gf)
         self.assertEqual(ac.elements.shape, (nx, ny))
         self.assertEqual(ac.grid.shape, (nx, ny))
@@ -195,7 +195,7 @@ class TestAutocorrelation(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         ac = calculate_autocorrelation_2d_wiener_khinchin(gf)
         center_idx = (ac.nx // 2, ac.ny // 2)
         self.assertAlmostEqual(0.0, ac.xx[center_idx])
@@ -208,7 +208,7 @@ class TestAutocorrelation(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         ac = calculate_autocorrelation_2d_wiener_khinchin(gf)
         center_idx = (ac.nx // 2, ac.ny // 2)
         peak_idx = gf.unravel_index(np.argmax(ac.elements))
@@ -221,7 +221,7 @@ class TestAutocorrelation(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), nx, endpoint=False),
                 RegularGrid1D.from_interval_given_n(Interval(0., 1.), ny, endpoint=False))
         values = np.random.rand(nx, ny)
-        gf = GridField2D(grid, values)
+        gf = GridMap2D(grid, values)
         ac = calculate_autocorrelation_2d_wiener_khinchin(gf)
         center_idx = (ac.nx // 2, ac.ny // 2)
         self.assertAlmostEqual(1.0, ac.elements[center_idx])
@@ -234,7 +234,7 @@ class TestAutocorrelation(unittest.TestCase):
         grid = RegularGrid2D(
                 RegularGrid1D.from_interval_given_n(x_interval, 1000, endpoint=False),
                 RegularGrid1D.from_interval_given_n(y_interval, 1000, endpoint=False))
-        gf = GridField2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
+        gf = GridMap2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
         ac = calculate_autocorrelation_2d_wiener_khinchin(gf)
 
         expected_x_period = 1.0 / fx
@@ -261,7 +261,7 @@ class TestAutocorrelation(unittest.TestCase):
                 RegularGrid1D.from_interval_given_n(Interval(-1, 2),
                                                     1000,
                                                     endpoint=False))
-        gf = GridField2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
+        gf = GridMap2D(grid, np.sin(2 * np.pi * (fx * grid.xx + fy * grid.yy)))
         ac = calculate_autocorrelation_2d_wiener_khinchin(gf)
         ac_of_ac = calculate_autocorrelation_2d_wiener_khinchin(ac)
         np.testing.assert_array_almost_equal(ac.elements, ac_of_ac.elements)

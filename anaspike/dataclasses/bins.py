@@ -7,7 +7,8 @@ from ..hdf5_mixin import HDF5Mixin
 from .grid import Grid1D, RegularGrid1D, RectilinearGrid2D
 from .interval import Interval
 from .coords2d import Coords2D
-from .field import Field2D, GridField2D
+from .cartesian_map_2d import CartesianMap2D
+from .grid_map_2d import  GridMap2D
 from .interval import Bin
 
 
@@ -163,25 +164,25 @@ def assign_bins_2d(bins: ContigBins2D[Grid2dT], coords: Coords2D) -> Tuple[NDArr
         raise ValueError("Some labels are outside the bin edges.")
     return x_bin_idxs, y_bin_idxs
 
-def calculate_bin_counts_2d(bins: ContigBins2D[Grid2dT], coords: Coords2D) -> GridField2D[Grid2dT,np.int64]:
+def calculate_bin_counts_2d(bins: ContigBins2D[Grid2dT], coords: Coords2D) -> GridMap2D[Grid2dT,np.int64]:
     #bin_counts, _, _ = np.histogram2d(coords.x, coords.y, bins=[bins.x.edges, bins.y.edges])
     x_bin_idxs, y_bin_idxs = assign_bins_2d(bins, coords)
     bin_counts = np.zeros(shape=bins.shape, dtype=np.int64)
     np.add.at(bin_counts, (x_bin_idxs, y_bin_idxs), 1)
-    return GridField2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_counts)
+    return GridMap2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_counts)
 
-def calculate_bin_sums_2d(bins: ContigBins2D[Grid2dT], field: Field2D[np.float64]) -> GridField2D[Grid2dT,np.float64]:
+def calculate_bin_sums_2d(bins: ContigBins2D[Grid2dT], field: CartesianMap2D[np.float64]) -> GridMap2D[Grid2dT,np.float64]:
     x_bin_idxs, y_bin_idxs = assign_bins_2d(bins, field.coords)
     bin_sums = np.zeros(shape=(*bins.shape, *field.element_shape), dtype=np.float64)
     np.add.at(bin_sums, (x_bin_idxs, y_bin_idxs), field.elements)
-    return GridField2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_sums)
+    return GridMap2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_sums)
 
 def calculate_bin_means_2d(bins: ContigBins2D[Grid2dT], field:
-                        Field2D[np.float64]) -> GridField2D[Grid2dT,np.float64]:
+                        CartesianMap2D[np.float64]) -> GridMap2D[Grid2dT,np.float64]:
     bin_sums = calculate_bin_sums_2d(bins, field).elements
     bin_counts = calculate_bin_counts_2d(bins, field.coords).elements
     broadcasted_bin_counts = bin_counts[..., np.newaxis] if field.element_ndim > 0 else bin_counts
     bin_means = np.divide(bin_sums, broadcasted_bin_counts, out=np.full_like(bin_sums, np.nan), where=broadcasted_bin_counts != 0)
-    return GridField2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_means)
+    return GridMap2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_means)
 
 
