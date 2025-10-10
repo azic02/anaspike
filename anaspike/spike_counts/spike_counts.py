@@ -23,7 +23,7 @@ class SpikeCounts(CartesianMap2D[np.int64]):
 
     @property
     def counts(self) -> NDArray[np.int64]:
-        return self.elements
+        return self.values
 
     def __array__(self, dtype: Union[DTypeLike, None] = None, copy: Union[bool, None] = None):
         return np.array(self.counts, dtype=dtype, copy=copy)

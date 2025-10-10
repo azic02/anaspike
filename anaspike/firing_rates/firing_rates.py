@@ -31,14 +31,10 @@ class FiringRates(CartesianMap2D[np.float64], HDF5Mixin):
 
     @property
     def firing_rates(self) -> NDArray[np.float64]:
-        return self.elements
+        return self.values
 
     def __array__(self, dtype: Union[DTypeLike, None] = None, copy: Union[bool, None] = None):
         return np.array(self.firing_rates, dtype=dtype, copy=copy)
-
-    @property
-    def shape(self):
-        return self.firing_rates.shape
 
 
 Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)

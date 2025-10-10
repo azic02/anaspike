@@ -20,7 +20,7 @@ def std(fr: FiringRates) -> float:
 
 Grid1dT = TypeVar("Grid1dT", bound=Grid1D)
 def construct_histogram(fr: FiringRates, bins: ContigBins1D[Grid1dT]) -> Histogram:
-    return Histogram.construct_by_counting(bins, fr.elements)
+    return Histogram.construct_by_counting(bins, fr.values)
 
 Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)
 def bin_spatially(fr: FiringRates, bins: ContigBins2D[Grid2dT]) -> BinnedFiringRates[Grid2dT]:

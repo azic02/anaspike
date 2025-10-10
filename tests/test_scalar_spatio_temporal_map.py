@@ -38,7 +38,7 @@ class TestTemporalCorrelation(unittest.TestCase):
         result = temporal_correlation(self.stm, self.ref)
         assert_array_almost_equal(result.coords.x, self.expected_coords.x)
         assert_array_almost_equal(result.coords.y, self.expected_coords.y)
-        assert_array_almost_equal(result.elements, self.expected_values)
+        assert_array_almost_equal(result.values, self.expected_values)
 
 
 class TestTemporalCorrelationMatrix(unittest.TestCase):

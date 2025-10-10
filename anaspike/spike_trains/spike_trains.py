@@ -24,7 +24,7 @@ class SpikeTrains(CartesianMap2D[np.object_], HDF5Mixin):
 
     @property
     def spike_trains(self):
-        return self.elements
+        return self.values
 
     @property
     def n_neurons(self) -> int:
