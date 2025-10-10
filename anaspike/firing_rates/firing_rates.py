@@ -16,8 +16,6 @@ from ..dataclasses.grid import RectilinearGrid2D
 
 class FiringRates(ScalarSpatialMap[Coords2D], HDF5Mixin):
     def __init__(self, coords: Coords2D, values: NDArray[np.float64]):
-        if values.ndim != 1:
-            raise ValueError("values must be a 1D array")
         super().__init__(coords, values)
 
     @classmethod
