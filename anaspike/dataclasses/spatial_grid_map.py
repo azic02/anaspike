@@ -9,7 +9,7 @@ from .grid import RectilinearGrid2D, RegularGrid2D, RegularGrid1D
 
 ElmnT = TypeVar("ElmnT", bound=np.generic)
 GridT = TypeVar("GridT", bound=RectilinearGrid2D)
-class GridMap2D(Generic[GridT, ElmnT]):
+class SpatialGridMap(Generic[GridT, ElmnT]):
     def __init__(self, grid: GridT, elements: NDArray[ElmnT]):
         if elements.ndim < 2:
             raise ValueError("elements must be at least a two-dimensional array.")
@@ -54,15 +54,15 @@ class GridMap2D(Generic[GridT, ElmnT]):
         return np.unravel_index(i, self.grid.shape)
 
 
-def calculate_fft_2d(gf: GridMap2D[RegularGrid2D,ElmnT]):
+def calculate_fft_2d(gf: SpatialGridMap[RegularGrid2D,ElmnT]):
     freq_x = np.fft.fftshift(np.fft.fftfreq(gf.nx, d=gf.grid.delta_x)).astype(np.float64)
     freq_y = np.fft.fftshift(np.fft.fftfreq(gf.ny, d=gf.grid.delta_y)).astype(np.float64)
     grid = RegularGrid2D(x=RegularGrid1D(freq_x), y=RegularGrid1D(freq_y))
     fft_elements = np.fft.fftshift(np.fft.fft2(gf.elements))
-    return GridMap2D(grid, fft_elements)
+    return SpatialGridMap(grid, fft_elements)
 
 
-def calculate_ifft_2d(gf: GridMap2D[RegularGrid2D,ElmnT]):
+def calculate_ifft_2d(gf: SpatialGridMap[RegularGrid2D,ElmnT]):
     spatial_x = np.fft.fftshift(np.fft.fftfreq(gf.nx, d=gf.grid.delta_x))
     spatial_y = np.fft.fftshift(np.fft.fftfreq(gf.ny, d=gf.grid.delta_y))
     grid = RegularGrid2D(
@@ -71,19 +71,19 @@ def calculate_ifft_2d(gf: GridMap2D[RegularGrid2D,ElmnT]):
     )
     
     ifft_data = np.fft.ifft2(np.fft.ifftshift(gf.elements))
-    return GridMap2D(grid, ifft_data)
+    return SpatialGridMap(grid, ifft_data)
 
 
-def calculate_psd_2d(gf: GridMap2D[RegularGrid2D,ElmnT]) -> GridMap2D[RegularGrid2D,np.float64]:
+def calculate_psd_2d(gf: SpatialGridMap[RegularGrid2D,ElmnT]) -> SpatialGridMap[RegularGrid2D,np.float64]:
     fft = calculate_fft_2d(gf)
     psd_elements = np.abs(fft.elements) ** 2
-    return GridMap2D(fft.grid, psd_elements)
+    return SpatialGridMap(fft.grid, psd_elements)
 
 
-def calculate_autocorrelation_2d_wiener_khinchin(gf: GridMap2D[RegularGrid2D,ElmnT]) -> GridMap2D[RegularGrid2D,np.float64]:
+def calculate_autocorrelation_2d_wiener_khinchin(gf: SpatialGridMap[RegularGrid2D,ElmnT]) -> SpatialGridMap[RegularGrid2D,np.float64]:
     psd = calculate_psd_2d(gf)
     unshifted_ac = calculate_ifft_2d(psd)
     ac_at_zero_lag = unshifted_ac.elements[0,0].real
-    normalised_ac = GridMap2D(unshifted_ac.grid, np.fft.fftshift(unshifted_ac.elements.real) / ac_at_zero_lag)
+    normalised_ac = SpatialGridMap(unshifted_ac.grid, np.fft.fftshift(unshifted_ac.elements.real) / ac_at_zero_lag)
     return normalised_ac
 

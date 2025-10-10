@@ -9,7 +9,7 @@ from ..spike_trains import SpikeTrains
 from ..dataclasses.interval import Interval
 from ..dataclasses.coords2d import Coords2D
 from ..dataclasses.spatial_map import SpatialMap
-from ..dataclasses.grid_map_2d import GridMap2D
+from ..dataclasses.spatial_grid_map import SpatialGridMap
 from ..dataclasses.grid import RectilinearGrid2D
 
 
@@ -38,5 +38,5 @@ class FiringRates(SpatialMap[Coords2D, np.float64], HDF5Mixin):
 
 
 Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)
-BinnedFiringRates = GridMap2D[Grid2dT, np.float64]
+BinnedFiringRates = SpatialGridMap[Grid2dT, np.float64]
 

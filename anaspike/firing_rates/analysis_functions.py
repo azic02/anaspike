@@ -8,7 +8,7 @@ from ..dataclasses.bins import ContigBins1D
 from ..dataclasses.bins import ContigBins2D
 from ..dataclasses.bins import calculate_bin_means_2d
 from ..dataclasses.grid import Grid1D, RectilinearGrid2D, RegularGrid2D
-from ..dataclasses.grid_map_2d import calculate_psd_2d, calculate_autocorrelation_2d_wiener_khinchin
+from ..dataclasses.spatial_grid_map import calculate_psd_2d, calculate_autocorrelation_2d_wiener_khinchin
 
 
 
