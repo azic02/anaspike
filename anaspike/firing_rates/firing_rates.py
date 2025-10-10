@@ -8,13 +8,13 @@ from ..spike_counts import SpikeCounts
 from ..spike_trains import SpikeTrains
 from ..dataclasses.interval import Interval
 from ..dataclasses.coords2d import Coords2D
-from ..dataclasses.cartesian_map_2d import CartesianMap2D
+from ..dataclasses.spatial_map import SpatialMap
 from ..dataclasses.grid_map_2d import GridMap2D
 from ..dataclasses.grid import RectilinearGrid2D
 
 
 
-class FiringRates(CartesianMap2D[Coords2D, np.float64], HDF5Mixin):
+class FiringRates(SpatialMap[Coords2D, np.float64], HDF5Mixin):
     def __init__(self, coords: Coords2D, firing_rates: NDArray[np.float64]):
         if firing_rates.ndim != 1:
             raise ValueError("firing_rates must be a 1D array")

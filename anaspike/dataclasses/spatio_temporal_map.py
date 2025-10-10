@@ -4,7 +4,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 from .coords2d import Coords2D
-from .cartesian_map_2d import CartesianMap2D
+from .spatial_map import SpatialMap
 from .temporal_map import TemporalMap
 
 
@@ -62,7 +62,7 @@ class SpatioTemporalMap(Generic[CoordsT, ElmnT]):
         for elmn in self.__values:
             yield TemporalMap(self.__times, elmn)
 
-    def iter_time_dim(self) -> Iterator[CartesianMap2D[CoordsT, ElmnT]]:
+    def iter_time_dim(self) -> Iterator[SpatialMap[CoordsT, ElmnT]]:
         for t_idx in range(self.n_times):
-            yield CartesianMap2D(self.__coords, self.__values[:, t_idx])
+            yield SpatialMap(self.__coords, self.__values[:, t_idx])
 

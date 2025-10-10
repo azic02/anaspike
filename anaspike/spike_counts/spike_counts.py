@@ -3,14 +3,14 @@ from typing import Union
 import numpy as np
 from numpy.typing import NDArray, DTypeLike
 
-from ..dataclasses.cartesian_map_2d import CartesianMap2D
+from ..dataclasses.spatial_map import SpatialMap
 from ..dataclasses.coords2d import Coords2D
 from ..dataclasses.interval import Interval
 from ..spike_trains import SpikeTrains
 
 
 
-class SpikeCounts(CartesianMap2D[Coords2D, np.int64]):
+class SpikeCounts(SpatialMap[Coords2D, np.int64]):
     def __init__(self, coords: Coords2D, counts: NDArray[np.int64]):
         if len(coords) != len(counts):
             raise ValueError("Length of `coords` must match length of `counts`.")

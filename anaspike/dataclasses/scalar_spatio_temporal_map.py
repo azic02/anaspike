@@ -6,7 +6,7 @@ from numpy.typing import NDArray
 from .spatio_temporal_map import SpatioTemporalMap
 from .scalar_temporal_map import ScalarTemporalMap
 from .scalar_temporal_map import correlation as temporal_map_correlation
-from .cartesian_map_2d import CartesianMap2D
+from .spatial_map import SpatialMap
 from .coords2d import Coords2D
 
 
@@ -20,8 +20,8 @@ class ScalarSpatioTemporalMap(SpatioTemporalMap[CoordsT, np.float64]):
 
 
 def temporal_correlation(stm: ScalarSpatioTemporalMap[CoordsT],
-                         ref: ScalarTemporalMap) -> CartesianMap2D[CoordsT, np.float64]:
-    return CartesianMap2D(stm.coords,
+                         ref: ScalarTemporalMap) -> SpatialMap[CoordsT, np.float64]:
+    return SpatialMap(stm.coords,
                           np.array([temporal_map_correlation(ref, tm) for tm in stm.iter_coords_dim()]))
 
 

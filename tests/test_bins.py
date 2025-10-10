@@ -160,27 +160,27 @@ class TestCalculateBinCounts(TestClassSetup):
 class TestCalculateBinSums(TestClassSetup):
     def test_coords_outside_bins(self):
         from anaspike.dataclasses.bins import calculate_bin_sums_2d
-        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
-        field = CartesianMap2D(self.coords_outside_bins,
+        from anaspike.dataclasses.spatial_map import SpatialMap
+        sm = SpatialMap(self.coords_outside_bins,
                         np.array(np.arange(4) + 1, dtype=np.float64))
         with self.assertRaises(ValueError):
-            calculate_bin_sums_2d(self.bins, field)
+            calculate_bin_sums_2d(self.bins, sm)
 
-    def test_calculate_bin_sums_2d_scalar_field(self):
+    def test_calculate_bin_sums_2d_scalar_sm(self):
         from anaspike.dataclasses.bins import calculate_bin_sums_2d
-        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
-        field = CartesianMap2D(self.coords,
+        from anaspike.dataclasses.spatial_map import SpatialMap
+        sm = SpatialMap(self.coords,
                       np.array(np.arange(4) + 1, dtype=np.float64))
         expected_sums = np.array([[1, 6],
                                   [0, 0],
                                   [0, 3]])
-        bin_sums = calculate_bin_sums_2d(self.bins, field)
+        bin_sums = calculate_bin_sums_2d(self.bins, sm)
         np.testing.assert_array_almost_equal(bin_sums.elements, expected_sums)
 
-    def test_calculate_bin_sums_2d_vector_field_2d(self):
+    def test_calculate_bin_sums_2d_vector_sm_2d(self):
         from anaspike.dataclasses.bins import calculate_bin_sums_2d
-        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
-        field = CartesianMap2D(self.coords,
+        from anaspike.dataclasses.spatial_map import SpatialMap
+        sm = SpatialMap(self.coords,
                         np.array([[1, 2],
                                   [3, 4],
                                   [5, 6],
@@ -189,33 +189,33 @@ class TestCalculateBinSums(TestClassSetup):
                                   [[0, 0], [0, 0]],
                                   [[0, 0], [5, 6]]
                                  ])
-        bin_sums = calculate_bin_sums_2d(self.bins, field)
+        bin_sums = calculate_bin_sums_2d(self.bins, sm)
         np.testing.assert_array_almost_equal(bin_sums.elements, expected_sums)
 
 class TestCalculateBinMeans(TestClassSetup):
     def test_coords_outside_bins(self):
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
-        field = CartesianMap2D(self.coords_outside_bins,
+        from anaspike.dataclasses.spatial_map import SpatialMap
+        sm = SpatialMap(self.coords_outside_bins,
                         np.array(np.arange(4) + 1, dtype=np.float64))
         with self.assertRaises(ValueError):
-            calculate_bin_means_2d(self.bins, field)
+            calculate_bin_means_2d(self.bins, sm)
 
-    def test_calculate_bin_means_2d_sclar_field(self):
+    def test_calculate_bin_means_2d_sclar_sm(self):
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
-        field = CartesianMap2D(self.coords,
+        from anaspike.dataclasses.spatial_map import SpatialMap
+        sm = SpatialMap(self.coords,
                         np.array(np.arange(4) + 1, dtype=np.float64))
         expected_means = np.array([[1 / 1, 6 / 2],
                                    [np.nan, np.nan],
                                    [np.nan, 3 / 1]])
-        bin_means = calculate_bin_means_2d(self.bins, field)
+        bin_means = calculate_bin_means_2d(self.bins, sm)
         np.testing.assert_array_almost_equal(bin_means.elements, expected_means)
 
-    def test_calculate_bin_means_2d_vector_field_2d(self):
+    def test_calculate_bin_means_2d_vector_sm_2d(self):
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
-        field = CartesianMap2D(self.coords,
+        from anaspike.dataclasses.spatial_map import SpatialMap
+        sm = SpatialMap(self.coords,
                         np.array([[1, 2],
                                   [3, 4],
                                   [5, 6],
@@ -223,18 +223,18 @@ class TestCalculateBinMeans(TestClassSetup):
         expected_means = np.array([[[1 / 1, 2 / 1],  [10 / 2, 12 / 2]],
                                    [[np.nan, np.nan], [np.nan, np.nan]],
                                    [[np.nan, np.nan], [5 / 1, 6 / 1]]])
-        bin_means = calculate_bin_means_2d(self.bins, field)
+        bin_means = calculate_bin_means_2d(self.bins, sm)
         np.testing.assert_array_almost_equal(bin_means.elements, expected_means)
 
-    def test_calculate_bin_means_2d_another_scalar_field(self):
+    def test_calculate_bin_means_2d_another_scalar_sm(self):
         import numpy as np
         from anaspike.dataclasses.bins import ContigBins2D
         from anaspike.dataclasses.grid import RegularGrid2D, RegularGrid1D
         from anaspike.dataclasses.interval import Interval
-        from anaspike.dataclasses.cartesian_map_2d import CartesianMap2D
+        from anaspike.dataclasses.spatial_map import SpatialMap
         from anaspike.dataclasses.coords2d import Coords2D
         from anaspike.dataclasses.bins import calculate_bin_means_2d
-        field = CartesianMap2D(
+        sm = SpatialMap(
                 Coords2D(x=np.array([0.1, 0.4, 0.6, 0.8, 0.2, 0.3, 0.5]),
                          y=np.array([1.5, 0.7, 0.2, 0.9, 1.9, 1.4, 0.8])),
                 np.array([1, 2, 3, 4, 5, 6, 7]))
@@ -249,6 +249,6 @@ class TestCalculateBinMeans(TestClassSetup):
                                           [2.    , 11./2],
                                           [12./3 , np.nan]]).T
                                                
-        binned_field = calculate_bin_means_2d(bins, field)
-        np.testing.assert_array_almost_equal(binned_field.elements, expected_firing_rates)
+        binned_sm = calculate_bin_means_2d(bins, sm)
+        np.testing.assert_array_almost_equal(binned_sm.elements, expected_firing_rates)
 
