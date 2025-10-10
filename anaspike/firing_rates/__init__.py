@@ -7,6 +7,7 @@ from .analysis_functions import (mean,
                                  bin_spatially,
                                  calculate_spatial_psd,
                                  calculate_spatial_autocorrelation_wiener_khinchin,
+                                 calculate_morans_i,
                                  )
 
 __all__ = ["FiringRates",
@@ -17,6 +18,7 @@ __all__ = ["FiringRates",
            "bin_spatially",
            "calculate_spatial_psd",
            "calculate_spatial_autocorrelation_wiener_khinchin",
+           "calculate_morans_i",
           ]
 
 

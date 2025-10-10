@@ -103,6 +103,10 @@ fig.colorbar(scat, ax=ax, label='firing rate [Hz]')
 plt.show()
 # -
 
+from anaspike.firing_rates import calculate_morans_i
+morans_i = calculate_morans_i(firing_ratess)
+print(morans_i)
+
 from anaspike.firing_rates import mean as tafr_mean
 from anaspike.firing_rates import std as tafr_std
 print(tafr_mean(firing_ratess), tafr_std(firing_ratess))

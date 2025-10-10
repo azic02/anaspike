@@ -9,6 +9,7 @@ from ..dataclasses.bins import ContigBins2D
 from ..dataclasses.bins import calculate_bin_means_2d
 from ..dataclasses.grid import Grid1D, RectilinearGrid2D, RegularGrid2D
 from ..dataclasses.spatial_grid_map import calculate_psd_2d, calculate_autocorrelation_2d_wiener_khinchin
+from ..dataclasses.scalar_spatial_map import morans_i
 
 
 
@@ -31,4 +32,7 @@ def calculate_spatial_psd(fr: BinnedFiringRates[RegularGrid2D]):
 
 def calculate_spatial_autocorrelation_wiener_khinchin(fr: BinnedFiringRates[RegularGrid2D]):
     return calculate_autocorrelation_2d_wiener_khinchin(fr)
+
+def calculate_morans_i(fr: FiringRates):
+    return morans_i(fr)
 
