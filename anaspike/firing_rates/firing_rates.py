@@ -15,10 +15,10 @@ from ..dataclasses.grid import RectilinearGrid2D
 
 
 class FiringRates(SpatialMap[Coords2D, np.float64], HDF5Mixin):
-    def __init__(self, coords: Coords2D, firing_rates: NDArray[np.float64]):
-        if firing_rates.ndim != 1:
-            raise ValueError("firing_rates must be a 1D array")
-        super().__init__(coords, firing_rates)
+    def __init__(self, coords: Coords2D, values: NDArray[np.float64]):
+        if values.ndim != 1:
+            raise ValueError("values must be a 1D array")
+        super().__init__(coords, values)
 
     @classmethod
     def from_spike_counts(cls, spike_counts: SpikeCounts, time_window: Interval, time_unit: float=1.e-3):
@@ -28,10 +28,6 @@ class FiringRates(SpatialMap[Coords2D, np.float64], HDF5Mixin):
     def from_spike_trains(cls, spike_trains: SpikeTrains, time_window: Interval, time_unit: float=1.e-3):
         spike_counts = SpikeCounts.from_spike_trains(spike_trains, time_window)
         return cls.from_spike_counts(spike_counts, time_window, time_unit)
-
-    @property
-    def firing_rates(self) -> NDArray[np.float64]:
-        return self.values
 
 
 Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)

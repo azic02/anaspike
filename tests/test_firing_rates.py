@@ -11,14 +11,14 @@ class TestInit(unittest.TestCase):
         from anaspike.dataclasses.coords2d import Coords2D
         self.coords = Coords2D(x=[0.0, 1.0, 2.0], y=[0.0, 1.0, 2.0])
     def test_valid_init(self):
-        fr = FiringRates(self.coords, firing_rates=np.array([0.0, 1.0, 2.0]))
+        fr = FiringRates(self.coords, values=np.array([0.0, 1.0, 2.0]))
         self.assertIsInstance(fr, FiringRates)
         np.testing.assert_array_almost_equal(fr.values, np.array([0.0, 1.0, 2.0]))
 
     def test_invalid_dimensions(self):
         with self.assertRaises(ValueError):
             FiringRates(self.coords,
-                                   firing_rates=np.array([[0.0, 1.0],
+                                   values=np.array([[0.0, 1.0],
                                                           [2.0, 3.0]]))
 
 
@@ -56,7 +56,7 @@ class TestHdf5Conversion(unittest.TestCase):
         self.file_path = Path('test_ta_fr.h5')
         self.fr = FiringRates(
                 coords=Coords2D(x=[0.0, 1.0, 2.0], y=[0.0, 1.0, 2.0]),
-                firing_rates=np.array([0.0, 1.0, 2.0]))
+                values=np.array([0.0, 1.0, 2.0]))
 
     def test_to_hdf5_and_from_hdf5(self):
         import h5py
