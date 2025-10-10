@@ -8,13 +8,13 @@ from ..spike_counts import SpikeCounts
 from ..spike_trains import SpikeTrains
 from ..dataclasses.interval import Interval
 from ..dataclasses.coords2d import Coords2D
-from ..dataclasses.spatial_map import SpatialMap
-from ..dataclasses.spatial_grid_map import SpatialGridMap
+from ..dataclasses.scalar_spatial_map import ScalarSpatialMap
+from ..dataclasses.scalar_spatial_grid_map import ScalarSpatialGridMap
 from ..dataclasses.grid import RectilinearGrid2D
 
 
 
-class FiringRates(SpatialMap[Coords2D, np.float64], HDF5Mixin):
+class FiringRates(ScalarSpatialMap[Coords2D], HDF5Mixin):
     def __init__(self, coords: Coords2D, values: NDArray[np.float64]):
         if values.ndim != 1:
             raise ValueError("values must be a 1D array")
@@ -31,5 +31,5 @@ class FiringRates(SpatialMap[Coords2D, np.float64], HDF5Mixin):
 
 
 Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)
-BinnedFiringRates = SpatialGridMap[Grid2dT, np.float64]
+BinnedFiringRates = ScalarSpatialGridMap[Grid2dT]
 
