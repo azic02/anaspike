@@ -42,11 +42,3 @@ class TemporalMap(Generic[ElmnT]):
     def values(self) -> NDArray[ElmnT]:
         return self.__values
 
-
-def correlation(tm1: TemporalMap[np.float64], tm2: TemporalMap[np.float64]) -> float:
-    if tm1.ndim != 0 or tm2.ndim != 0:
-        raise ValueError("Both TemporalMaps must be 0D (i.e., time series of scalars).")
-    if tm1.n_times != tm2.n_times:
-        raise ValueError("Both TemporalMaps must have the same number of time points.")
-    return np.corrcoef(tm1.values, tm2.values)[0, 1]
-
