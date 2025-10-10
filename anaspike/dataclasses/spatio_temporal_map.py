@@ -62,7 +62,7 @@ class SpatioTemporalMap(Generic[CoordsT, ElmnT]):
         for elmn in self.__values:
             yield TemporalMap(self.__times, elmn)
 
-    def iter_time_dim(self) -> Iterator[CartesianMap2D[ElmnT]]:
+    def iter_time_dim(self) -> Iterator[CartesianMap2D[CoordsT, ElmnT]]:
         for t_idx in range(self.n_times):
             yield CartesianMap2D(self.__coords, self.__values[:, t_idx])
 

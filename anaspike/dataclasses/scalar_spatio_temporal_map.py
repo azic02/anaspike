@@ -19,8 +19,8 @@ class ScalarSpatioTemporalMap(SpatioTemporalMap[CoordsT, np.float64]):
             raise ValueError("ScalarSpatioTemporalMap only supports scalar values (i.e., `values` must have shape (n_coords, n_times)).")
 
 
-def temporal_correlation(stm: ScalarSpatioTemporalMap[Coords2D],
-                         ref: ScalarTemporalMap) -> CartesianMap2D[np.float64]:
+def temporal_correlation(stm: ScalarSpatioTemporalMap[CoordsT],
+                         ref: ScalarTemporalMap) -> CartesianMap2D[CoordsT, np.float64]:
     return CartesianMap2D(stm.coords,
                           np.array([temporal_map_correlation(ref, tm) for tm in stm.iter_coords_dim()]))
 

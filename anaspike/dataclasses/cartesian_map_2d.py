@@ -7,9 +7,10 @@ from .coords2d import Coords2D
 
 
 
+CoordsT = TypeVar("CoordsT", bound=Coords2D)
 ElmnT = TypeVar("ElmnT", bound=np.generic)
-class CartesianMap2D(Generic[ElmnT]):
-    def __init__(self, coords: Coords2D, values: NDArray[ElmnT]):
+class CartesianMap2D(Generic[CoordsT, ElmnT]):
+    def __init__(self, coords: CoordsT, values: NDArray[ElmnT]):
         if values.ndim < 1:
             raise ValueError("values must at least be a one-dimensional array.")
         if len(coords) != values.shape[0]:
@@ -19,7 +20,7 @@ class CartesianMap2D(Generic[ElmnT]):
         self.__values = values
 
     @property
-    def coords(self) -> Coords2D:
+    def coords(self) -> CoordsT:
         return self.__coords
 
     @property

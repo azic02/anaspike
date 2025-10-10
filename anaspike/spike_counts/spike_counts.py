@@ -10,7 +10,7 @@ from ..spike_trains import SpikeTrains
 
 
 
-class SpikeCounts(CartesianMap2D[np.int64]):
+class SpikeCounts(CartesianMap2D[Coords2D, np.int64]):
     def __init__(self, coords: Coords2D, counts: NDArray[np.int64]):
         if len(coords) != len(counts):
             raise ValueError("Length of `coords` must match length of `counts`.")

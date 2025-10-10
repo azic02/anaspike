@@ -171,14 +171,17 @@ def calculate_bin_counts_2d(bins: ContigBins2D[Grid2dT], coords: Coords2D) -> Gr
     np.add.at(bin_counts, (x_bin_idxs, y_bin_idxs), 1)
     return GridMap2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_counts)
 
-def calculate_bin_sums_2d(bins: ContigBins2D[Grid2dT], field: CartesianMap2D[np.float64]) -> GridMap2D[Grid2dT,np.float64]:
+CoordsT = TypeVar("CoordsT", bound=Coords2D)
+def calculate_bin_sums_2d(bins: ContigBins2D[Grid2dT],
+                          field: CartesianMap2D[CoordsT, np.float64]) -> GridMap2D[Grid2dT,np.float64]:
     x_bin_idxs, y_bin_idxs = assign_bins_2d(bins, field.coords)
     bin_sums = np.zeros(shape=(*bins.shape, *field.shape), dtype=np.float64)
     np.add.at(bin_sums, (x_bin_idxs, y_bin_idxs), field.values)
     return GridMap2D(bins.grid.__class__(bins.grid.x.__class__(bins.x_labels), bins.grid.y.__class__(bins.y_labels)), bin_sums)
 
-def calculate_bin_means_2d(bins: ContigBins2D[Grid2dT], field:
-                        CartesianMap2D[np.float64]) -> GridMap2D[Grid2dT,np.float64]:
+
+def calculate_bin_means_2d(bins: ContigBins2D[Grid2dT],
+                           field: CartesianMap2D[CoordsT, np.float64]) -> GridMap2D[Grid2dT,np.float64]:
     bin_sums = calculate_bin_sums_2d(bins, field).elements
     bin_counts = calculate_bin_counts_2d(bins, field.coords).elements
     broadcasted_bin_counts = bin_counts[..., np.newaxis] if field.ndim > 0 else bin_counts
