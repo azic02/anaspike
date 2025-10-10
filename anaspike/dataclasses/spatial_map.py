@@ -8,9 +8,9 @@ from .coords2d import Coords2D
 
 
 CoordsT = TypeVar("CoordsT", bound=Coords2D)
-ElmnT = TypeVar("ElmnT", bound=np.generic)
-class SpatialMap(Generic[CoordsT, ElmnT]):
-    def __init__(self, coords: CoordsT, values: NDArray[ElmnT]):
+ValT = TypeVar("ValT", bound=np.generic)
+class SpatialMap(Generic[CoordsT, ValT]):
+    def __init__(self, coords: CoordsT, values: NDArray[ValT]):
         if values.ndim < 1:
             raise ValueError("values must at least be a one-dimensional array.")
         if len(coords) != values.shape[0]:
@@ -24,7 +24,7 @@ class SpatialMap(Generic[CoordsT, ElmnT]):
         return self.__coords
 
     @property
-    def values(self) -> NDArray[ElmnT]:
+    def values(self) -> NDArray[ValT]:
         return self.__values
 
     @property

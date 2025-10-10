@@ -5,9 +5,9 @@ from numpy.typing import NDArray
 
 
 
-ElmnT = TypeVar("ElmnT", bound=np.generic)
-class TemporalMap(Generic[ElmnT]):
-    def __init__(self, times: NDArray[np.float64], values: NDArray[ElmnT]):
+ValT = TypeVar("ValT", bound=np.generic)
+class TemporalMap(Generic[ValT]):
+    def __init__(self, times: NDArray[np.float64], values: NDArray[ValT]):
         if times.ndim != 1:
             raise ValueError("times must be a one-dimensional array.")
         if values.ndim < 1:
@@ -39,6 +39,6 @@ class TemporalMap(Generic[ElmnT]):
         return self.__values.shape[1]
 
     @property
-    def values(self) -> NDArray[ElmnT]:
+    def values(self) -> NDArray[ValT]:
         return self.__values
 
