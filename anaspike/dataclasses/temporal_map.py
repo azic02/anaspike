@@ -1,4 +1,4 @@
-from typing import Generic, TypeVar, Iterator
+from typing import Generic, TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
@@ -35,6 +35,14 @@ class TemporalMap(Generic[ElmnT]):
         return self.__times
 
     @property
-    def along_time_dim(self) -> Iterator[NDArray[ElmnT]]:
-        yield from self.__elements
+    def along_time_dim(self) -> NDArray[ElmnT]:
+        return self.__elements
+
+
+def correlation(tm1: TemporalMap[np.float64], tm2: TemporalMap[np.float64]) -> float:
+    if tm1.ndim != 0 or tm2.ndim != 0:
+        raise ValueError("Both TemporalMaps must be 0D (i.e., time series of scalars).")
+    if tm1.n_times != tm2.n_times:
+        raise ValueError("Both TemporalMaps must have the same number of time points.")
+    return np.corrcoef(tm1.along_time_dim, tm2.along_time_dim)[0, 1]
 
