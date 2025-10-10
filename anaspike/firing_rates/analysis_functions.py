@@ -13,10 +13,10 @@ from ..dataclasses.spatial_grid_map import calculate_psd_2d, calculate_autocorre
 
 
 def mean(fr: FiringRates) -> float:
-    return np.mean(fr, dtype=np.float64)
+    return np.mean(fr.values, dtype=np.float64)
 
 def std(fr: FiringRates) -> float:
-    return np.std(fr, dtype=np.float64)
+    return np.std(fr.values, dtype=np.float64)
 
 Grid1dT = TypeVar("Grid1dT", bound=Grid1D)
 def construct_histogram(fr: FiringRates, bins: ContigBins1D[Grid1dT]) -> Histogram:

@@ -96,7 +96,7 @@ from anaspike.firing_rates import FiringRates
 firing_ratess = FiringRates.from_spike_trains(spike_trains, t_interval)
 
 fig, ax = plt.subplots()
-scat = ax.scatter(x=pop.coords.x, y=pop.coords.y, c=firing_ratess, vmin=0., cmap='Greys', s=10)
+scat = ax.scatter(x=pop.coords.x, y=pop.coords.y, c=firing_ratess.values, vmin=0., cmap='Greys', s=10)
 ax.set_xlabel('cortical space [mm]')
 ax.set_ylabel('cortical space [mm]')
 fig.colorbar(scat, ax=ax, label='firing rate [Hz]')

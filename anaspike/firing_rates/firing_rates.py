@@ -1,7 +1,7 @@
-from typing import Union, TypeVar
+from typing import TypeVar
 
 import numpy as np
-from numpy.typing import NDArray, DTypeLike
+from numpy.typing import NDArray
 
 from ..hdf5_mixin import HDF5Mixin
 from ..spike_counts import SpikeCounts
@@ -32,9 +32,6 @@ class FiringRates(SpatialMap[Coords2D, np.float64], HDF5Mixin):
     @property
     def firing_rates(self) -> NDArray[np.float64]:
         return self.values
-
-    def __array__(self, dtype: Union[DTypeLike, None] = None, copy: Union[bool, None] = None):
-        return np.array(self.firing_rates, dtype=dtype, copy=copy)
 
 
 Grid2dT = TypeVar("Grid2dT", bound=RectilinearGrid2D)
