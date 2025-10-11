@@ -17,7 +17,7 @@ class ScalarSpatialMap(SpatialMap[CoordsT, np.float64]):
         super().__init__(coords, values)
 
 
-def morans_i(sm: ScalarSpatialMap[Coords2D]) -> float:
+def morans_i(sm: ScalarSpatialMap[CoordsT]) -> float:
     distances = calculate_pairwise_2d_euclidean_distances(sm.coords.x, sm.coords.y)
     np.fill_diagonal(distances, 1.)
     weights = np.power(distances, -1)
