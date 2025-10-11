@@ -6,30 +6,6 @@ from anaspike.firing_rates_evolution import FiringRatesEvolution
 
 
 
-class TestFiringRatesEvolutionInit(unittest.TestCase):
-    def test_valid_input(self):
-        times = np.array([0.0, 1.0, 2.0])
-        firing_rates = np.array([[1.0, 2.0, 3.0],
-                                 [4.0, 5.0, 6.0]])
-        ifr = FiringRatesEvolution(times=times, firing_rates=firing_rates)
-        self.assertTrue(np.array_equal(ifr.times, times))
-        self.assertTrue(np.array_equal(ifr.along_neuron_dim, firing_rates))
-
-    def test_invalid_times_shape(self):
-        with self.assertRaises(ValueError):
-            FiringRatesEvolution(times=np.array([[0.0], [1.0]]), firing_rates=np.array([[1.0]]))
-
-    def test_invalid_firing_rates_shape(self):
-        with self.assertRaises(ValueError):
-            FiringRatesEvolution(times=np.array([0.0]), firing_rates=np.array([1.0]))
-
-    def test_mismatched_dimensions(self):
-        with self.assertRaises(ValueError):
-            FiringRatesEvolution(times=np.array([0.0, 1.0]),
-                                     firing_rates=np.array([[1.0],
-                                                            [2.0]]))
-
-
 class TestFiringRatesEvolutionClassMethods(unittest.TestCase):
     def setUp(self):
         from anaspike.dataclasses.bins import ContigBins1D
@@ -62,7 +38,7 @@ class TestFiringRatesEvolutionClassMethods(unittest.TestCase):
             time_bins=self.time_bins
         )
         np.testing.assert_array_equal(ifr.times, expected_times)
-        np.testing.assert_array_equal(ifr.along_time_dim, expected_firing_rates)
+        np.testing.assert_array_equal(ifr.values_time_major, expected_firing_rates)
 
     def test_from_nest(self):
         from anaspike.dataclasses.nest_devices import PopulationData, SpikeRecorderData
@@ -88,17 +64,20 @@ class TestFiringRatesEvolutionClassMethods(unittest.TestCase):
             time_bins=self.time_bins
         )
         np.testing.assert_array_equal(ifr.times, expected_times)
-        np.testing.assert_array_equal(ifr.along_time_dim, expected_firing_rates)
+        np.testing.assert_array_equal(ifr.values_time_major, expected_firing_rates)
 
 
 class TestFiringRatesEvolutionProperties(unittest.TestCase):
     def setUp(self):
+        from anaspike.dataclasses.coords2d import Coords2D
+        coords = Coords2D([0, 1, 2], [0, 1, 2])
         self.firing_rates = np.array([[1.0, 2.0, 3.0],
                                       [4.0, 5.0, 6.0],
                                       [7.0, 8.0, 9.0]])
         self.firing_rates_evolutions = FiringRatesEvolution(
+            coords=coords,
             times= np.array([0.0, 1.0, 2.0]),
-            firing_rates=np.array(self.firing_rates),
+            values=np.array(self.firing_rates),
         )
 
     def test_hdf5(self):
@@ -107,19 +86,19 @@ class TestFiringRatesEvolutionProperties(unittest.TestCase):
             self.firing_rates_evolutions.to_hdf5(f, 'firing_rates_evolutions')
         with h5py.File('test_firing_rates_evolutions.h5', 'r') as f:
             loaded = FiringRatesEvolution.from_hdf5(f['firing_rates_evolutions'])
-        np.testing.assert_array_equal(loaded.along_neuron_dim, self.firing_rates_evolutions.along_neuron_dim)
+        np.testing.assert_array_equal(loaded.values_neurons_major, self.firing_rates_evolutions.values_neurons_major)
         np.testing.assert_array_equal(loaded.times, self.firing_rates_evolutions.times)
 
-    def test_along_time_dim(self):
+    def test_values_time_major(self):
         for actual, expected in zip(
-            self.firing_rates_evolutions.along_time_dim,
+            self.firing_rates_evolutions.values_time_major,
             self.firing_rates.T
         ):
             np.testing.assert_array_equal(actual, expected)
 
-    def test_along_neuron_dim(self):
+    def test_values_neurons_major(self):
         for actual, expected in zip(
-            self.firing_rates_evolutions.along_neuron_dim,
+            self.firing_rates_evolutions.values_neurons_major,
             self.firing_rates
         ):
             np.testing.assert_array_equal(actual, expected)

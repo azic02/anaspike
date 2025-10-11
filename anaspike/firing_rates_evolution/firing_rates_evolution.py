@@ -1,34 +1,35 @@
+from typing import Iterator
+
 import numpy as np
 from numpy.typing import NDArray
 
+from ..dataclasses.scalar_spatio_temporal_map import ScalarSpatioTemporalMap
+from ..dataclasses.coords2d import Coords2D
 from ..hdf5_mixin import HDF5Mixin
 from ..dataclasses.nest_devices import PopulationData, SpikeRecorderData
 from ..dataclasses.histogram import Histogram
 from ..dataclasses.grid import RegularGrid1D
 from ..dataclasses.bins import ContigBins1D
 from ..spike_trains import SpikeTrains
+from ..dataclasses.scalar_temporal_map import ScalarTemporalMap
 
 
 
-class FiringRatesEvolution(HDF5Mixin):
-    def __init__(self, times: NDArray[np.float64], firing_rates: NDArray[np.float64]):
-        if times.ndim != 1:
-            raise ValueError("`times` must be a 1D array.")
-        if firing_rates.ndim != 2:
-            raise ValueError("`firing_rates` must be a 2D array.")
-        if times.shape[0] != firing_rates.shape[1]:
-            raise ValueError("First dimension of `times` and second dimension of `firing_rates` must match.")
+FiringRateEvolution = ScalarTemporalMap
 
-        self.__times = times
-        self.__firing_rates = firing_rates
+
+class FiringRatesEvolution(ScalarSpatioTemporalMap[Coords2D], HDF5Mixin):
+    def __init__(self, coords: Coords2D, times: NDArray[np.float64], values: NDArray[np.float64]):
+        super().__init__(coords=coords, times=times, values=values)
 
     @classmethod
     def from_spike_trains(cls, spike_trains: SpikeTrains,
                           time_bins: ContigBins1D[RegularGrid1D]) -> "FiringRatesEvolution":
         spike_counts = np.array([Histogram.construct_by_counting(bins=time_bins, data=st).counts for st in spike_trains])
         return cls(
+            coords=spike_trains.coords,
             times=time_bins.labels,
-            firing_rates=np.array(spike_counts) / time_bins.edges.delta * 1.e3
+            values=np.array(spike_counts) / time_bins.edges.delta * 1.e3
         )
 
     @classmethod
@@ -38,26 +39,17 @@ class FiringRatesEvolution(HDF5Mixin):
         return cls.from_spike_trains(spike_trains=spike_trains, time_bins=time_bins)
 
     @property
-    def times(self) -> NDArray[np.float64]:
-        return self.__times
-
-    @property
-    def _firing_rates(self) -> NDArray[np.float64]:
-        return self.along_neuron_dim
-
-    @property
-    def along_time_dim(self):
-        return self.__firing_rates.T
-
-    @property
-    def along_neuron_dim(self):
-        return self.__firing_rates
-
-    @property
-    def n_times(self) -> int:
-        return self.times.shape[0]
-
-    @property
     def n_neurons(self) -> int:
-        return self.along_neuron_dim.shape[0]
+        return self.n_values
+
+    def iter_neuron_dim(self) -> Iterator[ScalarTemporalMap]:
+        yield from self.iter_coords_dim()
+
+    @property
+    def values_neurons_major(self) -> NDArray[np.float64]:
+        return self.values_coords_major
+
+    @property
+    def _values(self):
+        return self.values_coords_major
 

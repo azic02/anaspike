@@ -165,22 +165,25 @@ from anaspike.firing_rates_evolution import FiringRatesEvolution
 firing_rates_evolution = FiringRatesEvolution.from_spike_trains(spike_trains, t_bins)
 
 # +
+from anaspike.firing_rates_evolution import FiringRateEvolution
 from anaspike.firing_rates_evolution import temporal_correlation
 from anaspike.visualization import plot_firing_rate_temporal_correlation
 
 e = 0.02
 center_mask = (-e < pop.x_pos) & (pop.x_pos < e) & (-e < pop.y_pos) & (pop.y_pos < e)
 ref_neuron = pop[center_mask][0]
-ref_neuron_firing_rate = firing_rates_evolution.along_neuron_dim[center_mask][0]
+ref_neuron_firing_rate = FiringRateEvolution(times=firing_rates_evolution.times,
+                                             values=firing_rates_evolution.values_neurons_major[center_mask][0])
 
 t_corr = temporal_correlation(firing_rates_evolution, ref_neuron_firing_rate)
 
 fig, ax = plt.subplots(figsize=(12,10))
-plot_firing_rate_temporal_correlation(fig, ax,
-                                      (ref_neuron.x_pos, ref_neuron.y_pos),
-                                      pop.x_pos, pop.y_pos,
-                                      t_corr,
-                                      cmap='bwr')
+scat = ax.scatter(x=t_corr.coords.x, y=t_corr.coords.y, c=t_corr.values, vmin=-1, vmax=1, cmap='bwr')
+ax.scatter(ref_neuron.x_pos, ref_neuron.y_pos, facecolors='none', edgecolors='green', s=30, linewidth=5)
+ax.set_xlabel('cortical space x (mm)')
+ax.set_ylabel('cortical space y (mm)')
+fig.colorbar(scat, ax=ax, label="Pearson's correlation coefficient")
+plt.show()
 # +
 from anaspike.firing_rates_evolution import temporal_correlation_matrix
 from anaspike.visualization import plot_pairwise_temporal_correlation_matrix
@@ -193,10 +196,10 @@ plot_pairwise_temporal_correlation_matrix(fig, ax, t_corr_mat)
 from anaspike.firing_rates_evolution import morans_i_evolution
 from anaspike.visualization import plot_morans_i_evolution
 
-morans_i = morans_i_evolution(firing_rates_evolution, pop.coords, decay_power=4)
+morans_i = morans_i_evolution(firing_rates_evolution)
 
 fig, ax = plt.subplots()
-plot_morans_i_evolution(ax, time_vals, morans_i)
+plot_morans_i_evolution(ax, time_vals, morans_i.values)
 # -
 
 

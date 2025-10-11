@@ -6,6 +6,7 @@ from numpy.typing import NDArray
 from .coords2d import Coords2D
 from .spatial_map import SpatialMap
 from .temporal_map import TemporalMap
+from .interval2d import Interval2D
 
 
 

@@ -29,7 +29,7 @@ class Coords2D(HDF5Mixin):
     def __len__(self):
         return len(self.__x)
 
-    def __getitem__(self, s: Union[int, slice, NDArray[np.int64]]) -> "Coords2D":
+    def __getitem__(self, s: Union[int, slice, NDArray[np.int64], NDArray[np.bool_]]) -> "Coords2D":
         if isinstance(s, int):
             return Coords2D(self.__x[s:s+1], self.__y[s:s+1])
         return Coords2D(self.__x[s], self.__y[s])
