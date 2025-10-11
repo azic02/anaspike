@@ -10,9 +10,9 @@ from .temporal_map import TemporalMap
 
 
 CoordsT = TypeVar("CoordsT", bound=Coords2D)
-ElmnT = TypeVar("ElmnT", bound=np.generic)
-class SpatioTemporalMap(Generic[CoordsT, ElmnT]):
-    def __init__(self, coords: CoordsT, times: NDArray[np.float64], values: NDArray[ElmnT]):
+ValT = TypeVar("ValT", bound=np.generic)
+class SpatioTemporalMap(Generic[CoordsT, ValT]):
+    def __init__(self, coords: CoordsT, times: NDArray[np.float64], values: NDArray[ValT]):
         if times.ndim != 1:
             raise ValueError("times must be a one-dimensional array.")
         if values.ndim < 2:
@@ -51,18 +51,18 @@ class SpatioTemporalMap(Generic[CoordsT, ElmnT]):
         return len(self.coords)
 
     @property
-    def values_coords_major(self) -> NDArray[ElmnT]:
+    def values_coords_major(self) -> NDArray[ValT]:
         return self.__values
 
     @property
-    def values_time_major(self) -> NDArray[ElmnT]:
+    def values_time_major(self) -> NDArray[ValT]:
         return np.swapaxes(self.__values, 0, 1)
 
-    def iter_coords_dim(self) -> Iterator[TemporalMap[ElmnT]]:
+    def iter_coords_dim(self) -> Iterator[TemporalMap[ValT]]:
         for elmn in self.__values:
             yield TemporalMap(self.__times, elmn)
 
-    def iter_time_dim(self) -> Iterator[SpatialMap[CoordsT, ElmnT]]:
+    def iter_time_dim(self) -> Iterator[SpatialMap[CoordsT, ValT]]:
         for t_idx in range(self.n_times):
             yield SpatialMap(self.__coords, self.__values[:, t_idx])
 
